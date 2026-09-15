@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   SidebarGroup,
   SidebarMenu,
@@ -17,12 +18,17 @@ type Props = {
 }
 
 export function NavMain({ items }: Props) {
+  const pathname = usePathname()
   return (
     <SidebarGroup>
       <SidebarMenu>
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton render={<Link href={item.href} />}>
+            <SidebarMenuButton
+              size={'md'}
+              isActive={pathname === item.href}
+              render={<Link href={item.href} />}
+            >
               {item.icon}
               {item.title}
             </SidebarMenuButton>

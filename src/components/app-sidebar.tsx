@@ -7,9 +7,9 @@ import {
 } from 'lucide-react'
 import type * as React from 'react'
 import { Box2, ChartPie, Gear, Invoice, Users2 } from 'reicon-react'
+import { Logo } from '@/assets/logo'
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
-import { TeamSwitcher } from '@/components/team-switcher'
 import {
   Sidebar,
   SidebarContent,
@@ -20,27 +20,27 @@ import {
 
 export const menus = [
   {
-    href: '/',
+    href: '/dashboard',
     title: 'پیشخوان',
     icon: <ChartPie />,
   },
   {
-    href: '/invoices',
+    href: '/dashboard/invoices',
     title: 'فاکتور ها',
     icon: <Invoice />,
   },
   {
-    href: '/customers',
+    href: '/dashboard/customers',
     title: 'مشتریان',
     icon: <Users2 />,
   },
   {
-    href: '/products',
+    href: '/dashboard/products',
     title: 'محصولات',
     icon: <Box2 />,
   },
   {
-    href: '/settings',
+    href: '/dashboard/settings',
     title: 'تنظیمات',
     icon: <Gear />,
   },
@@ -75,8 +75,8 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
-      <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+      <SidebarHeader className="p-4 pb-1">
+        <Logo className="text-primary" />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={menus} />
