@@ -104,7 +104,15 @@ export function CustomerForm({ customer }: { customer?: Customer }) {
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="نوع مشتری" />
+                    <SelectValue>
+                      {(value) =>
+                        value === 'individual'
+                          ? 'حقیقی'
+                          : value === 'corporate'
+                            ? 'حقوقی'
+                            : 'نوع مشتری'
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="individual">حقیقی</SelectItem>

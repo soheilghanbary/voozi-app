@@ -112,7 +112,13 @@ export function ProductForm({ product }: { product?: Product }) {
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="نوع" />
+                    <SelectValue>
+                      {(value) =>
+                        value
+                          ? (PRODUCT_TYPE[value as ProductType]?.label ?? 'نوع')
+                          : 'نوع'
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {(Object.keys(PRODUCT_TYPE) as ProductType[]).map(
@@ -138,7 +144,14 @@ export function ProductForm({ product }: { product?: Product }) {
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="واحد" />
+                    <SelectValue>
+                      {(value) =>
+                        value
+                          ? (PRODUCT_UNITS[value as ProductUnit]?.label ??
+                            'واحد')
+                          : 'واحد'
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {(Object.keys(PRODUCT_UNITS) as ProductUnit[]).map(

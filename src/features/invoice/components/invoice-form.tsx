@@ -225,7 +225,12 @@ export function InvoiceForm({
               render={({ field }) => (
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="انتخاب مشتری..." />
+                    <SelectValue>
+                      {(value) =>
+                        customers.find((customer) => customer.id === value)
+                          ?.name ?? 'انتخاب مشتری...'
+                      }
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {customers.map((customer) => (
@@ -306,7 +311,16 @@ export function InvoiceForm({
                         }
                       >
                         <SelectTrigger className="w-full">
-                          <SelectValue placeholder="انتخاب..." />
+                          <SelectValue>
+                            {(value) => {
+                              if (!value || value === NO_PRODUCT)
+                                return 'انتخاب...'
+                              return (
+                                products.find((product) => product.id === value)
+                                  ?.name ?? 'انتخاب...'
+                              )
+                            }}
+                          </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value={NO_PRODUCT}>
