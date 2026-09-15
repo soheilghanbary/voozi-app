@@ -75,7 +75,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
-      <SidebarHeader className="p-4 pb-1">
+      <SidebarHeader className="p-4 pb-2">
         <Logo className="text-primary" />
       </SidebarHeader>
       <SidebarContent>

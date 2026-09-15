@@ -14,16 +14,11 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/server/orpc/client'
 import type { Customer } from '../types'
+import { CUSTOMER_TYPE, type CustomerType } from '../types'
 import {
   type CustomerFormValues,
   customerFormSchema,
@@ -96,29 +91,23 @@ export function CustomerForm({ customer }: { customer?: Customer }) {
           </FieldContent>
         </Field>
         <Field>
-          <FieldLabel>حقیقی یا حقوقی</FieldLabel>
+          <FieldLabel>نوع مشتری</FieldLabel>
           <FieldContent>
             <Controller
               control={control}
               name="customerType"
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue>
-                      {(value) =>
-                        value === 'individual'
-                          ? 'حقیقی'
-                          : value === 'corporate'
-                            ? 'حقوقی'
-                            : 'نوع مشتری'
-                      }
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="individual">حقیقی</SelectItem>
-                    <SelectItem value="corporate">حقوقی</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Tabs value={field.value} onValueChange={field.onChange}>
+                  <TabsList>
+                    {(Object.keys(CUSTOMER_TYPE) as CustomerType[]).map(
+                      (customerType) => (
+                        <TabsTrigger key={customerType} value={customerType}>
+                          {CUSTOMER_TYPE[customerType].label}
+                        </TabsTrigger>
+                      )
+                    )}
+                  </TabsList>
+                </Tabs>
               )}
             />
             <FieldError>{errors.customerType?.message}</FieldError>
