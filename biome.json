@@ -38,7 +38,8 @@
         "noShadowRestrictedNames": "off",
         "noArrayIndexKey": "off",
         "noUnknownAtRules": "off",
-        "noAssignInExpressions": "off"
+        "noAssignInExpressions": "off",
+        "noDocumentCookie": "off"
       },
       "nursery": {
         "preset": "recommended",

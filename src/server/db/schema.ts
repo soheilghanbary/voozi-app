@@ -71,3 +71,29 @@ export const verification = pgTable(
   },
   (table) => [index('verification_identifier_idx').on(table.identifier)]
 )
+
+export const customer = pgTable(
+  'customer',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').references(() => user.id, {
+      onDelete: 'cascade',
+    }),
+    name: text('name').notNull(),
+    customerType: text('customer_type', {
+      enum: ['individual', 'corporate'],
+    })
+      .default('individual')
+      .notNull(),
+    mobile: text('mobile'),
+    phone: text('phone'),
+    address: text('address'),
+    nationalId: text('national_id').notNull().unique(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index('customer_userId_idx').on(table.userId)]
+)

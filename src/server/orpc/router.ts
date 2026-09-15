@@ -1,9 +1,16 @@
-import { os } from '@orpc/server'
-
-export const helloRouter = os.handler(async () => {
-  return { message: 'Hello World!' }
-})
+import {
+  createCustomer,
+  deleteCustomer,
+  updateCustomer,
+} from '@/features/customer/api/mutations'
+import { getCustomer, listCustomers } from '@/features/customer/api/queries'
 
 export const router = {
-  hello: helloRouter,
+  customers: {
+    create: createCustomer,
+    update: updateCustomer,
+    delete: deleteCustomer,
+    list: listCustomers,
+    get: getCustomer,
+  },
 }
