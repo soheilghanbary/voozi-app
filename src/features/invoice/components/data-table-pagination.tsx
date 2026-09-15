@@ -23,7 +23,7 @@ export function DataTablePagination<TData extends RowData>({
   table,
 }: DataTablePaginationProps<TData>) {
   return (
-    <div className="flex items-center justify-end gap-6 px-2 lg:gap-8">
+    <div className="flex flex-wrap items-center justify-end gap-x-6 gap-y-3 px-2 lg:gap-x-8">
       <div className="flex items-center gap-2">
         <p className="whitespace-nowrap font-medium text-sm">ردیف در صفحه</p>
         <Select

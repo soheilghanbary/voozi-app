@@ -73,8 +73,8 @@ export function DataTable<TData extends RowData>({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <div className="relative w-full max-w-sm">
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative w-full min-w-0 max-w-sm">
           <SearchIcon className="pointer-events-none absolute inset-s-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="جستجوی شماره یا نام مشتری..."
@@ -111,7 +111,7 @@ export function DataTable<TData extends RowData>({
           </Button>
         </div>
       )}
-      <div className="overflow-hidden rounded-lg border">
+      <div className="overflow-x-auto rounded-lg border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
