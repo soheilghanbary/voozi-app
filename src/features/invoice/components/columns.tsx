@@ -2,7 +2,8 @@
 
 import { createColumnHelper } from '@tanstack/react-table'
 import { Badge } from '@/components/ui/badge'
-import { INVOICE_STATUS, type Invoice, type InvoiceStatus } from '../types'
+import { Checkbox } from '@/components/ui/checkbox'
+import { INVOICE_TYPE, type Invoice, type InvoiceType } from '../types'
 import type { InvoiceTableFeatures } from '../utils/data-table-features'
 import { dateFormatter, numberFormatter } from '../utils/format'
 import { DataTableColumnHeader } from './data-table-column-header'
@@ -10,16 +11,26 @@ import { DataTableRowActions } from './data-table-row-actions'
 
 const columnHelper = createColumnHelper<InvoiceTableFeatures, Invoice>()
 
-const statusVariant: Record<
-  InvoiceStatus,
-  'default' | 'secondary' | 'destructive' | 'outline' | 'ghost' | 'link'
-> = {
-  draft: 'outline',
-  confirmed: 'secondary',
-  cancelled: 'destructive',
-}
-
 export const columns = columnHelper.columns([
+  columnHelper.display({
+    id: 'select',
+    header: ({ table }) => (
+      <Checkbox
+        checked={table.getIsAllPageRowsSelected()}
+        indeterminate={table.getIsSomePageRowsSelected()}
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="انتخاب همه"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="انتخاب ردیف"
+      />
+    ),
+    enableHiding: false,
+  }),
   columnHelper.accessor('number', {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="شماره" />
@@ -64,15 +75,15 @@ export const columns = columnHelper.columns([
       </div>
     ),
   }),
-  columnHelper.accessor('status', {
+  columnHelper.accessor('type', {
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="وضعیت" />
+      <DataTableColumnHeader column={column} title="نوع" />
     ),
     cell: ({ row }) => {
-      const status = row.getValue<InvoiceStatus>('status')
+      const type = row.getValue<InvoiceType>('type')
       return (
-        <Badge variant={statusVariant[status]}>
-          {INVOICE_STATUS[status].label}
+        <Badge variant={type === 'invoice' ? 'secondary' : 'outline'}>
+          {INVOICE_TYPE[type].label}
         </Badge>
       )
     },

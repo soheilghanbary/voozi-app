@@ -24,11 +24,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import type { Customer } from '@/features/customer/types'
 import { PRODUCT_UNITS, type Product } from '@/features/product/types'
 import { api } from '@/server/orpc/client'
-import type { InvoiceDetail } from '../types'
+import { INVOICE_TYPE, type InvoiceDetail, type InvoiceType } from '../types'
 import { numberFormatter } from '../utils/format'
 import {
   type InvoiceFormValues,
@@ -47,6 +48,7 @@ const emptyItem: InvoiceFormValues['items'][number] = {
 }
 
 const emptyForm: InvoiceFormValues = {
+  type: 'invoice',
   customerId: '',
   discount: 0,
   taxRate: 0,
@@ -109,6 +111,7 @@ function computeTotals(
 
 function toFormValues(invoice: InvoiceDetail): InvoiceFormValues {
   return {
+    type: invoice.type,
     customerId: invoice.customerId ?? '',
     discount: invoice.discount,
     taxRate: invoice.taxRate,
@@ -139,7 +142,6 @@ export function InvoiceForm({
     control,
     register,
     handleSubmit,
-    reset,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<InvoiceFormValues>({
@@ -171,7 +173,8 @@ export function InvoiceForm({
       } else {
         await api.invoices.create(values)
         toast.success('فاکتور جدید با موفقیت ثبت شد.')
-        reset(emptyForm)
+        router.push('/dashboard/invoices')
+        router.refresh()
       }
     } catch (error) {
       if (error instanceof ORPCError && error.code === 'NOT_FOUND') {
@@ -197,6 +200,21 @@ export function InvoiceForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+      <Controller
+        control={control}
+        name="type"
+        render={({ field }) => (
+          <Tabs value={field.value} onValueChange={field.onChange}>
+            <TabsList>
+              {(Object.keys(INVOICE_TYPE) as InvoiceType[]).map((type) => (
+                <TabsTrigger key={type} value={type}>
+                  {INVOICE_TYPE[type].label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        )}
+      />
       <div className="grid gap-5 sm:grid-cols-2">
         <Field>
           <FieldLabel>مشتری</FieldLabel>

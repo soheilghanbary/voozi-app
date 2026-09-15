@@ -2,7 +2,7 @@ import 'server-only'
 
 import { randomUUID } from 'node:crypto'
 import { ORPCError } from '@orpc/server'
-import { and, desc, eq } from 'drizzle-orm'
+import { and, desc, eq, inArray } from 'drizzle-orm'
 import { z } from 'zod'
 import { invoiceFormSchema } from '@/features/invoice/utils/invoice-schema'
 import { db } from '@/server/db'
@@ -37,7 +37,7 @@ export const createInvoice = authed
           userId: context.userId,
           customerId: input.customerId,
           number: nextNumber,
-          status: 'draft',
+          type: input.type,
           discount: input.discount,
           taxRate: input.taxRate,
           note: input.note,
@@ -57,7 +57,7 @@ export const createInvoice = authed
         }))
       )
 
-      return inserted
+      return [inserted]
     })
 
     return { id: created.id }
@@ -84,6 +84,7 @@ export const updateInvoice = authed
         .update(invoice)
         .set({
           customerId: input.customerId,
+          type: input.type,
           discount: input.discount,
           taxRate: input.taxRate,
           note: input.note,
@@ -109,6 +110,20 @@ export const updateInvoice = authed
     })
 
     return { id: input.id }
+  })
+
+export const deleteManyInvoices = authed
+  .input(z.object({ ids: z.array(z.string().min(1)).min(1).max(100) }))
+  .output(z.object({ count: z.number() }))
+  .handler(async ({ input, context }) => {
+    const deleted = await db
+      .delete(invoice)
+      .where(
+        and(inArray(invoice.id, input.ids), eq(invoice.userId, context.userId))
+      )
+      .returning({ id: invoice.id })
+
+    return { count: deleted.length }
   })
 
 export const deleteInvoice = authed

@@ -144,10 +144,10 @@ export const invoice = pgTable(
       onDelete: 'set null',
     }),
     number: integer('number').notNull(),
-    status: text('status', {
-      enum: ['draft', 'confirmed', 'cancelled'],
+    type: text('type', {
+      enum: ['proforma', 'invoice'],
     })
-      .default('draft')
+      .default('invoice')
       .notNull(),
     issueDate: timestamp('issue_date').defaultNow().notNull(),
     dueDate: timestamp('due_date'),

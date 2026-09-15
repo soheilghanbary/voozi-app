@@ -7,6 +7,7 @@ import { getCustomer, listCustomers } from '@/features/customer/api/queries'
 import {
   createInvoice,
   deleteInvoice,
+  deleteManyInvoices,
   updateInvoice,
 } from '@/features/invoice/api/mutations'
 import { getInvoice, listInvoices } from '@/features/invoice/api/queries'
@@ -36,6 +37,7 @@ export const router = {
     create: createInvoice,
     update: updateInvoice,
     delete: deleteInvoice,
+    deleteMany: deleteManyInvoices,
     list: listInvoices,
     get: getInvoice,
   },

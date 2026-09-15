@@ -1,4 +1,7 @@
 import { z } from 'zod'
+import { INVOICE_TYPE, type InvoiceType } from '../types'
+
+const typeKeys = Object.keys(INVOICE_TYPE) as [InvoiceType, ...InvoiceType[]]
 
 export const invoiceItemFormSchema = z.object({
   productId: z.string().nullable().optional(),
@@ -16,6 +19,9 @@ export const invoiceItemFormSchema = z.object({
 })
 
 export const invoiceFormSchema = z.object({
+  type: z.enum(typeKeys, {
+    message: 'نوع فاکتور را انتخاب کنید',
+  }),
   customerId: z.string().trim().min(1, 'مشتری را انتخاب کنید'),
   discount: z
     .number({ message: 'تخفیف را وارد کنید' })

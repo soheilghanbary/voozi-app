@@ -1,10 +1,9 @@
-export const INVOICE_STATUS = {
-  draft: { label: 'پیش‌نویس' },
-  confirmed: { label: 'تأیید شده' },
-  cancelled: { label: 'لغو شده' },
+export const INVOICE_TYPE = {
+  proforma: { label: 'پیش فاکتور' },
+  invoice: { label: 'فاکتور فروش' },
 } as const
 
-export type InvoiceStatus = keyof typeof INVOICE_STATUS
+export type InvoiceType = keyof typeof INVOICE_TYPE
 
 export type InvoiceItem = {
   id: string
@@ -19,9 +18,9 @@ export type InvoiceItem = {
 export type Invoice = {
   id: string
   number: number
+  type: InvoiceType
   customerId: string | null
   customerName: string | null
-  status: InvoiceStatus
   issueDate: string
   dueDate: string | null
   discount: number
@@ -38,6 +37,6 @@ export const INVOICE_COLUMN_LABELS: Record<string, string> = {
   customerName: 'مشتری',
   issueDate: 'تاریخ صدور',
   total: 'جمع کل',
-  status: 'وضعیت',
+  type: 'نوع',
   createdAt: 'تاریخ ثبت',
 }

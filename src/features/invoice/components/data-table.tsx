@@ -1,9 +1,20 @@
 'use client'
 
 import type { ColumnDef, RowData } from '@tanstack/react-table'
-import { SearchIcon } from 'lucide-react'
+import { SearchIcon, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import {
   Table,
@@ -13,6 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { api } from '@/server/orpc/client'
 import { useInvoiceTable } from '../hooks/use-invoice-table'
 import type { InvoiceTableFeatures } from '../utils/data-table-features'
 import { DataTablePagination } from './data-table-pagination'
@@ -27,10 +39,37 @@ export function DataTable<TData extends RowData>({
   columns,
   data,
 }: DataTableProps<TData>) {
+  const router = useRouter()
   const { table, searchValue, handleSearch } = useInvoiceTable({
     columns,
     data,
   })
+
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const selectedRows = table.getSelectedRowModel().rows
+  const selectedCount = selectedRows.length
+
+  const selectedIds = selectedRows.map((row) => {
+    const invoice = row.original as { id: string }
+    return invoice.id
+  })
+
+  async function handleDeleteSelected() {
+    setIsDeleting(true)
+    try {
+      await api.invoices.deleteMany({ ids: selectedIds })
+      toast.success('فاکتورهای انتخاب‌شده حذف شدند.')
+      setDeleteOpen(false)
+      table.resetRowSelection()
+      router.refresh()
+    } catch (_error) {
+      toast.error('حذف فاکتورها ناموفق بود. دوباره تلاش کنید.')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -56,6 +95,22 @@ export function DataTable<TData extends RowData>({
           <DataTableViewOptions table={table} />
         </div>
       </div>
+      {selectedCount > 0 && (
+        <div className="flex items-center gap-2 rounded-lg border bg-muted/50 px-3 py-2">
+          <span className="text-muted-foreground text-sm">
+            {selectedCount} فاکتور انتخاب شده است.
+          </span>
+          <Button
+            size="sm"
+            variant="destructive"
+            className="ms-auto h-7"
+            onClick={() => setDeleteOpen(true)}
+          >
+            <Trash2 />
+            حذف انتخاب‌شده‌ها
+          </Button>
+        </div>
+      )}
       <div className="overflow-hidden rounded-lg border">
         <Table>
           <TableHeader>
@@ -76,7 +131,10 @@ export function DataTable<TData extends RowData>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() ? 'selected' : undefined}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="text-center">
                       <table.FlexRender cell={cell} />
@@ -98,6 +156,33 @@ export function DataTable<TData extends RowData>({
         </Table>
       </div>
       <DataTablePagination table={table} />
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>حذف فاکتورها</DialogTitle>
+            <DialogDescription>
+              آیا از حذف {selectedCount} فاکتور انتخاب‌شده مطمئن هستید؟ این
+              عملیات قابل بازگشت نیست.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              disabled={isDeleting}
+              onClick={() => setDeleteOpen(false)}
+            >
+              انصراف
+            </Button>
+            <Button
+              variant="destructive"
+              disabled={isDeleting}
+              onClick={handleDeleteSelected}
+            >
+              {isDeleting ? 'در حال حذف…' : 'حذف'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

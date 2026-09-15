@@ -27,18 +27,24 @@ export function useInvoiceTable<TData extends RowData>({
   )
   const [columnVisibility, setColumnVisibility] =
     React.useState<ColumnVisibilityState>({})
+  const [rowSelection, setRowSelection] = React.useState<Record<string, true>>(
+    {}
+  )
 
   const table = useTable({
     features,
     data,
     columns,
+    enableRowSelection: true,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
+    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
+      rowSelection,
     },
   })
 

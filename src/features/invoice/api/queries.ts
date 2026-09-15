@@ -7,23 +7,20 @@ import { db } from '@/server/db'
 import { customer, invoice, invoiceItem } from '@/server/db/schema'
 import { authed } from '@/server/orpc/context'
 import {
-  INVOICE_STATUS,
+  INVOICE_TYPE,
   type Invoice,
   type InvoiceItem,
-  type InvoiceStatus,
+  type InvoiceType,
 } from '../types'
 
-const statusKeys = Object.keys(INVOICE_STATUS) as [
-  InvoiceStatus,
-  ...InvoiceStatus[],
-]
+const typeKeys = Object.keys(INVOICE_TYPE) as [InvoiceType, ...InvoiceType[]]
 
 const invoiceOutput = z.object({
   id: z.string(),
   number: z.number(),
+  type: z.enum(typeKeys),
   customerId: z.string().nullable(),
   customerName: z.string().nullable(),
-  status: z.enum(statusKeys),
   issueDate: z.string(),
   dueDate: z.string().nullable(),
   discount: z.number(),
@@ -75,11 +72,11 @@ function mapInvoice(
   return {
     id: row.id,
     number: row.number,
+    type: row.type,
     customerId: row.customerId,
     customerName: row.customerId
       ? (customerNames.get(row.customerId) ?? null)
       : null,
-    status: row.status,
     issueDate: row.issueDate.toISOString(),
     dueDate: row.dueDate ? row.dueDate.toISOString() : null,
     discount: row.discount,
