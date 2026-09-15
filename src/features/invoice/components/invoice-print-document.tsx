@@ -40,14 +40,14 @@ export function InvoicePrintDocument({ invoice }: { invoice: InvoiceDetail }) {
     : null
 
   return (
-    <div className="mx-auto w-198.5 max-w-full overflow-hidden rounded-2xl bg-white text-zinc-900 shadow-xl shadow-zinc-200/60 ring-1 ring-zinc-200 print:w-auto print:max-w-none print:rounded-none print:shadow-none print:ring-0">
+    <div className="mx-auto max-w-full overflow-hidden rounded-2xl bg-white text-zinc-900 ring-1 ring-zinc-200 print:w-auto print:max-w-none print:rounded-none print:shadow-none print:ring-0">
       <div className="h-1.5 bg-linear-to-l from-primary via-primary/60 to-primary/10" />
 
       <div className="px-10 pt-8 pb-10 print:px-4 print:pt-4 print:pb-4">
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="grid size-12 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
-              <FileText className="size-6" />
+            <div className="grid size-12 place-items-center rounded-2xl border text-primary-foreground shadow-xs">
+              <FileText className="size-6 text-blue-500" />
             </div>
             <div className="space-y-0.5">
               <p className="font-black text-lg text-zinc-900 leading-tight">

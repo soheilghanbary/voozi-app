@@ -25,7 +25,7 @@ export default async function Page({
   }
 
   return (
-    <div className="min-h-dvh bg-zinc-100 py-8 print:bg-white print:py-0">
+    <div className="min-h-dvh py-8 print:bg-white print:py-0">
       <div className="mx-auto max-w-4xl px-4 print:max-w-none print:p-0">
         <div className="mb-4 print:hidden">
           <PrintToolbar />

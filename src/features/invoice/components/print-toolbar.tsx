@@ -25,7 +25,7 @@ export function PrintToolbar() {
 
   return (
     <div className="print:hidden">
-      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-zinc-200 bg-white/80 px-4 py-3 shadow-sm backdrop-blur">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border px-4 py-3">
         <p className="text-xs text-zinc-500">
           پیش‌نمایش فاکتور — با «چاپ / ذخیره PDF» نسخه PDF فاکتور را دریافت کنید.
         </p>
