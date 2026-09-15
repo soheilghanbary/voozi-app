@@ -1,4 +1,13 @@
-import { boolean, index, pgTable, text, timestamp } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  index,
+  integer,
+  numeric,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+} from 'drizzle-orm/pg-core'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -96,4 +105,87 @@ export const customer = pgTable(
       .notNull(),
   },
   (table) => [index('customer_userId_idx').on(table.userId)]
+)
+
+export const product = pgTable(
+  'product',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').references(() => user.id, {
+      onDelete: 'cascade',
+    }),
+    name: text('name').notNull(),
+    productType: text('product_type', {
+      enum: ['product', 'service'],
+    })
+      .default('product')
+      .notNull(),
+    unit: text('unit').notNull(),
+    basePrice: integer('base_price').default(0).notNull(),
+    description: text('description'),
+    isActive: boolean('is_active').default(true).notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index('product_userId_idx').on(table.userId)]
+)
+
+export const invoice = pgTable(
+  'invoice',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').references(() => user.id, {
+      onDelete: 'cascade',
+    }),
+    customerId: text('customer_id').references(() => customer.id, {
+      onDelete: 'set null',
+    }),
+    number: integer('number').notNull(),
+    status: text('status', {
+      enum: ['draft', 'confirmed', 'cancelled'],
+    })
+      .default('draft')
+      .notNull(),
+    issueDate: timestamp('issue_date').defaultNow().notNull(),
+    dueDate: timestamp('due_date'),
+    discount: integer('discount').default(0).notNull(),
+    taxRate: integer('tax_rate').default(0).notNull(),
+    note: text('note'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [
+    index('invoice_userId_idx').on(table.userId),
+    index('invoice_customerId_idx').on(table.customerId),
+    uniqueIndex('invoice_userId_number_idx').on(table.userId, table.number),
+  ]
+)
+
+export const invoiceItem = pgTable(
+  'invoice_item',
+  {
+    id: text('id').primaryKey(),
+    invoiceId: text('invoice_id')
+      .notNull()
+      .references(() => invoice.id, { onDelete: 'cascade' }),
+    productId: text('product_id').references(() => product.id, {
+      onDelete: 'set null',
+    }),
+    name: text('name').notNull(),
+    unit: text('unit').notNull(),
+    quantity: numeric('quantity', { precision: 10, scale: 2 })
+      .default('1')
+      .notNull(),
+    unitPrice: integer('unit_price').default(0).notNull(),
+    discount: integer('discount').default(0).notNull(),
+    description: text('description'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+  },
+  (table) => [index('invoice_item_invoiceId_idx').on(table.invoiceId)]
 )

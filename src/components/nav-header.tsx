@@ -11,7 +11,7 @@ import { Button } from './ui/button'
 import { Separator } from './ui/separator'
 import { SidebarTrigger } from './ui/sidebar'
 
-const SearchInput = () => {
+const _SearchInput = () => {
   return (
     <Field className="mx-auto max-w-sm">
       <InputGroup>
@@ -40,8 +40,8 @@ export const NavHeader = () => {
   return (
     <header className="p-2">
       <nav className="flex items-center gap-x-2">
-        <SidebarTrigger className={'ms-1'} />
-        <SearchInput />
+        <SidebarTrigger className={'ms-1 ml-auto'} />
+        {/* <SearchInput /> */}
         <ModeToggle />
         <Separator
           orientation="vertical"
