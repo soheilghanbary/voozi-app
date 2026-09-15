@@ -6,7 +6,9 @@ export const OAuthButton = () => {
   return (
     <Button
       variant={'secondary'}
-      onClick={() => signIn.social({ provider: 'google' })}
+      onClick={() =>
+        signIn.social({ provider: 'google', callbackURL: '/dashboard' })
+      }
     >
       Sign In
     </Button>

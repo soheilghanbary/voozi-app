@@ -7,6 +7,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from '@/components/ui/sidebar'
 
 type Props = {
@@ -19,6 +20,8 @@ type Props = {
 
 export function NavMain({ items }: Props) {
   const pathname = usePathname()
+  const { isMobile, setOpenMobile } = useSidebar()
+
   return (
     <SidebarGroup>
       <SidebarMenu>
@@ -27,6 +30,9 @@ export function NavMain({ items }: Props) {
             <SidebarMenuButton
               size={'md'}
               isActive={pathname === item.href}
+              onClick={() => {
+                if (isMobile) setOpenMobile(false)
+              }}
               render={<Link href={item.href} />}
             >
               {item.icon}
