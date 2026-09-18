@@ -26,6 +26,7 @@ export type Invoice = {
   discount: number
   taxRate: number
   note: string
+  signature: boolean
   total: number
   createdAt: string
 }

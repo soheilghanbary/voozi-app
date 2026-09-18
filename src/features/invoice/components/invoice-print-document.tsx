@@ -315,7 +315,7 @@ export function InvoicePrintDocument({
           </div>
         </div>
 
-        {!invoice.note && (
+        {invoice.signature && (
           <div className="mt-8 flex items-end justify-end gap-8">
             <div className="w-36 border-zinc-300 border-b border-dashed pb-8 text-center">
               {profile?.signature ? (

@@ -203,6 +203,7 @@ export const invoice = pgTable(
     discount: integer('discount').default(0).notNull(),
     taxRate: integer('tax_rate').default(0).notNull(),
     note: text('note'),
+    signature: boolean('signature').default(false).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
       .defaultNow()

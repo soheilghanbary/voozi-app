@@ -26,6 +26,7 @@ const invoiceOutput = z.object({
   discount: z.number(),
   taxRate: z.number(),
   note: z.string(),
+  signature: z.boolean(),
   total: z.number(),
   createdAt: z.string(),
 })
@@ -82,6 +83,7 @@ function mapInvoice(
     discount: row.discount,
     taxRate: row.taxRate,
     note: row.note ?? '',
+    signature: row.signature,
     total: computeTotal(items, row.discount, row.taxRate),
     createdAt: row.createdAt.toISOString(),
   }

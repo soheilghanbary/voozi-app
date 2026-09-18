@@ -41,6 +41,7 @@ export const createInvoice = authed
           discount: input.discount,
           taxRate: input.taxRate,
           note: input.note,
+          signature: input.signature,
         })
         .returning({ id: invoice.id })
 
@@ -88,6 +89,7 @@ export const updateInvoice = authed
           discount: input.discount,
           taxRate: input.taxRate,
           note: input.note,
+          signature: input.signature,
         })
         .where(
           and(eq(invoice.id, input.id), eq(invoice.userId, context.userId))

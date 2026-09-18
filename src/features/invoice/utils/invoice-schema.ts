@@ -39,6 +39,7 @@ const invoiceBaseSchema = z.object({
     .min(0, 'درصد مالیات نمی‌تواند منفی باشد')
     .max(100, 'درصد مالیات حداکثر ۱۰۰ است'),
   note: z.string().trim().max(500, 'یادداشت حداکثر ۵۰۰ حرف باشد').optional(),
+  signature: z.boolean(),
 })
 
 export const invoiceFormSchema = invoiceBaseSchema.extend({

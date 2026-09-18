@@ -24,6 +24,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import type { Customer } from '@/features/customer/types'
@@ -53,6 +54,7 @@ const emptyForm: InvoiceFormValues = {
   discount: 0,
   taxRate: 0,
   note: '',
+  signature: false,
   items: [emptyItem],
 }
 
@@ -171,6 +173,7 @@ function toFormValues(invoice: InvoiceDetail): InvoiceFormValues {
     discount: invoice.discount,
     taxRate: invoice.taxRate,
     note: invoice.note,
+    signature: invoice.signature,
     items: invoice.items.map((item) => ({
       productId: item.productId,
       name: item.name,
@@ -718,6 +721,26 @@ export function InvoiceForm({
           <FieldError>{errors.note?.message}</FieldError>
         </FieldContent>
       </Field>
+
+      <Controller
+        control={control}
+        name="signature"
+        render={({ field }) => (
+          <div className="flex items-center justify-between gap-4 rounded-lg border bg-card/60 p-4">
+            <div className="space-y-0.5">
+              <p className="font-medium text-sm">نمایش امضا روی سند</p>
+              <p className="text-muted-foreground text-xs">
+                امضای فروشنده در پیش‌نمایش و پرینت نمایش داده شود
+              </p>
+            </div>
+            <Switch
+              checked={field.value}
+              onCheckedChange={field.onChange}
+              aria-label="نمایش امضا روی سند"
+            />
+          </div>
+        )}
+      />
 
       <div className="sticky bottom-3 z-10 flex flex-col gap-3 rounded-xl border bg-background/90 p-3 shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-background/75 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
