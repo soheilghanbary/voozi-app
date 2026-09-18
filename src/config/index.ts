@@ -1,6 +1,6 @@
 export const appConfig = {
-  name: 'Stack',
-  title: 'Stack',
+  name: 'Vezia',
+  title: 'Vezia',
   version: '1.0',
-  description: 'Full-Stack starter',
+  description: 'SaaS for managing tasks, notes, and products',
 }
