@@ -14,6 +14,7 @@ import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { listCustomers } from '@/features/customer/api/queries'
+import { QuickAddCustomerCard } from '@/features/customer/components/quick-add-customer-card'
 import type { Customer } from '@/features/customer/types'
 import { listInvoices } from '@/features/invoice/api/queries'
 import type { Invoice } from '@/features/invoice/types'
@@ -331,12 +332,6 @@ function QuickActionsSection() {
       href: '/dashboard/invoices/new',
       icon: <ReceiptText className="size-4.5" />,
     },
-    {
-      label: 'افزودن مشتری',
-      desc: 'ثبت مشتری جدید',
-      href: '/dashboard/customers',
-      icon: <Users className="size-4.5" />,
-    },
   ]
 
   return (
@@ -356,6 +351,7 @@ function QuickActionsSection() {
           </Card>
         </Link>
       ))}
+      <QuickAddCustomerCard />
       <QuickAddProductCard />
     </div>
   )
