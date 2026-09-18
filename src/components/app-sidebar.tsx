@@ -1,10 +1,5 @@
 'use client'
 
-import {
-  AudioLinesIcon,
-  GalleryVerticalEndIcon,
-  TerminalIcon,
-} from 'lucide-react'
 import type * as React from 'react'
 import { Box2, ChartPie, Gear, Invoice, Users2 } from 'reicon-react'
 import { Logo } from '@/assets/logo'
@@ -46,32 +41,6 @@ export const menus = [
   },
 ]
 
-// This is sample data.
-const data = {
-  user: {
-    name: 'Soheil',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-  teams: [
-    {
-      name: 'Acme Inc',
-      logo: <GalleryVerticalEndIcon />,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: <AudioLinesIcon />,
-      plan: 'Startup',
-    },
-    {
-      name: 'Evil Corp.',
-      logo: <TerminalIcon />,
-      plan: 'Free',
-    },
-  ],
-}
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar {...props}>
@@ -82,7 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavMain items={menus} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
