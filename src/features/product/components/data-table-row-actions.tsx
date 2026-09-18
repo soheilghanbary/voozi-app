@@ -2,7 +2,6 @@
 
 import { ORPCError } from '@orpc/client'
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -23,9 +22,11 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { api } from '@/server/orpc/client'
 import type { Product } from '../types'
+import { ProductFormDialog } from './product-form-dialog'
 
 export function DataTableRowActions({ product }: { product: Product }) {
   const router = useRouter()
+  const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
 
@@ -63,10 +64,7 @@ export function DataTableRowActions({ product }: { product: Product }) {
           <span className="sr-only">عملیات</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem
-            nativeButton={false}
-            render={<Link href={`/dashboard/products/${product.id}/edit`} />}
-          >
+          <DropdownMenuItem onClick={() => setEditOpen(true)}>
             <Pencil />
             ویرایش
           </DropdownMenuItem>
@@ -79,6 +77,11 @@ export function DataTableRowActions({ product }: { product: Product }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <ProductFormDialog
+        product={product}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+      />
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>

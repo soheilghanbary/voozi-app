@@ -2,7 +2,6 @@
 
 import type { ColumnDef, RowData } from '@tanstack/react-table'
 import { SearchIcon } from 'lucide-react'
-import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -17,6 +16,7 @@ import { useProductTable } from '../hooks/use-product-table'
 import type { ProductTableFeatures } from '../utils/data-table-features'
 import { DataTablePagination } from './data-table-pagination'
 import { DataTableViewOptions } from './data-table-view-options'
+import { ProductFormDialog } from './product-form-dialog'
 
 interface DataTableProps<TData extends RowData> {
   columns: ColumnDef<ProductTableFeatures, TData>[]
@@ -45,14 +45,13 @@ export function DataTable<TData extends RowData>({
           />
         </div>
         <div className="ms-auto flex items-center gap-2">
-          <Button
-            size="sm"
-            className="h-7"
-            nativeButton={false}
-            render={<Link href="/dashboard/products/new" />}
-          >
-            محصول جدید
-          </Button>
+          <ProductFormDialog
+            trigger={
+              <Button size="sm" className="h-7">
+                محصول جدید
+              </Button>
+            }
+          />
           <DataTableViewOptions table={table} />
         </div>
       </div>

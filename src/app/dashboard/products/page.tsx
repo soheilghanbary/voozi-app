@@ -1,4 +1,5 @@
 import { call } from '@orpc/server'
+import { PageHeader } from '@/components/page-header'
 import { listProducts } from '@/features/product/api/queries'
 import { columns } from '@/features/product/components/columns'
 import { DataTable } from '@/features/product/components/data-table'
@@ -10,7 +11,7 @@ export default async function Page() {
 
   return (
     <div className="space-y-4">
-      <h1 className="font-black text-xl">محصولات</h1>
+      <PageHeader title="محصولات" />
       <DataTable columns={columns} data={products} />
     </div>
   )

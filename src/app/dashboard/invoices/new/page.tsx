@@ -1,7 +1,5 @@
 import { call } from '@orpc/server'
-import { ArrowRight } from 'lucide-react'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
+import { PageHeader } from '@/components/page-header'
 import {
   Card,
   CardContent,
@@ -23,18 +21,11 @@ export default async function Page() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          nativeButton={false}
-          render={<Link href="/dashboard/invoices" />}
-          aria-label="بازگشت به لیست فاکتورها"
-        >
-          <ArrowRight />
-        </Button>
-        <h1 className="font-black text-xl">فاکتور جدید</h1>
-      </div>
+      <PageHeader
+        backHref="/dashboard/invoices"
+        backLabel="بازگشت به لیست فاکتورها"
+        title="فاکتور جدید"
+      />
       <Card className="max-w-5xl">
         <CardHeader>
           <CardTitle>افزودن فاکتور</CardTitle>

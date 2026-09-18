@@ -1,8 +1,6 @@
 import { call, ORPCError } from '@orpc/server'
-import { ArrowRight } from 'lucide-react'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { PageHeader } from '@/components/page-header'
 import { getInvoice } from '@/features/invoice/api/queries'
 import { InvoicePreviewActions } from '@/features/invoice/components/invoice-preview-actions'
 import { InvoicePrintDocument } from '@/features/invoice/components/invoice-print-document'
@@ -37,26 +35,21 @@ export default async function Page({
 
   return (
     <div className="space-y-4 py-4">
-      <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            nativeButton={false}
-            render={<Link href="/dashboard/invoices" />}
-            aria-label="بازگشت به لیست فاکتورها"
-          >
-            <ArrowRight />
-          </Button>
-          <h1 className="font-black text-xl">
+      <PageHeader
+        backHref="/dashboard/invoices"
+        backLabel="بازگشت به لیست فاکتورها"
+        title={
+          <>
             {INVOICE_TYPE[invoice.type].label} شماره{' '}
             <span className="tabular-nums">
               {numberFormatter.format(invoice.number)}
             </span>
-          </h1>
-        </div>
+          </>
+        }
+        className="print:hidden"
+      >
         <InvoicePreviewActions invoiceId={invoice.id} />
-      </div>
+      </PageHeader>
 
       <section aria-label="پیش‌نمایش سند" className="print:bg-white print:p-0">
         <div className="mx-auto max-w-4xl">

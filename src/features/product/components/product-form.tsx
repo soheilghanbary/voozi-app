@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ORPCError } from '@orpc/client'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -54,13 +53,20 @@ function toFormValues(product: Product): ProductFormValues {
   }
 }
 
-export function ProductForm({ product }: { product?: Product }) {
+export function ProductForm({
+  product,
+  onSaved,
+  onCancelled,
+}: {
+  product?: Product
+  onSaved?: () => void
+  onCancelled?: () => void
+}) {
   const router = useRouter()
   const {
     register,
     control,
     handleSubmit,
-    reset,
     formState: { errors, isSubmitting },
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productFormSchema),
@@ -72,13 +78,13 @@ export function ProductForm({ product }: { product?: Product }) {
       if (product) {
         await api.products.update({ id: product.id, ...values })
         toast.success('محصول با موفقیت ویرایش شد.')
-        router.push('/dashboard/products')
         router.refresh()
+        onSaved?.()
       } else {
         await api.products.create(values)
         toast.success('محصول جدید با موفقیت ثبت شد.')
-        router.push('/dashboard/products')
-        reset(emptyForm)
+        router.refresh()
+        onSaved?.()
       }
     } catch (error) {
       if (error instanceof ORPCError && error.code === 'NOT_FOUND') {
@@ -204,14 +210,16 @@ export function ProductForm({ product }: { product?: Product }) {
               ? 'ثبت تغییرات'
               : 'ثبت محصول'}
         </Button>
-        <Button
-          variant="outline"
-          nativeButton={false}
-          disabled={isSubmitting}
-          render={<Link href="/dashboard/products" />}
-        >
-          انصراف
-        </Button>
+        {onCancelled && (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={onCancelled}
+          >
+            انصراف
+          </Button>
+        )}
       </div>
     </form>
   )

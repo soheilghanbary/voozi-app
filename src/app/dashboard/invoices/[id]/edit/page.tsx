@@ -1,8 +1,6 @@
 import { call, ORPCError } from '@orpc/server'
-import { ArrowRight } from 'lucide-react'
-import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { Button } from '@/components/ui/button'
+import { PageHeader } from '@/components/page-header'
 import {
   Card,
   CardContent,
@@ -42,18 +40,11 @@ export default async function Page({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          nativeButton={false}
-          render={<Link href="/dashboard/invoices" />}
-          aria-label="بازگشت به لیست فاکتورها"
-        >
-          <ArrowRight />
-        </Button>
-        <h1 className="font-black text-xl">ویرایش فاکتور</h1>
-      </div>
+      <PageHeader
+        backHref="/dashboard/invoices"
+        backLabel="بازگشت به لیست فاکتورها"
+        title="ویرایش فاکتور"
+      />
       <Card className="max-w-5xl">
         <CardHeader>
           <CardTitle>ویرایش «فاکتور شماره {invoice.number}»</CardTitle>
