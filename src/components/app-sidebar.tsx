@@ -11,7 +11,9 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from '@/components/ui/sidebar'
+import { cn } from '@/lib/utils'
 
 export const menus = [
   {
@@ -42,10 +44,27 @@ export const menus = [
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { state } = useSidebar()
+
   return (
     <Sidebar {...props}>
       <SidebarHeader className="p-4 pb-2">
-        <Logo className="text-primary" />
+        <div className="flex items-center gap-2">
+          <Logo
+            className={cn(
+              'size-6 text-primary transition-[width,height] duration-200 ease-linear',
+              state === 'collapsed' && 'size-5'
+            )}
+          />
+          <p
+            className={cn(
+              'font-black text-base/6',
+              state === 'collapsed' && 'hidden'
+            )}
+          >
+            وزیا
+          </p>
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={menus} />

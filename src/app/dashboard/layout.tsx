@@ -20,7 +20,7 @@ export default async function DashboardLayout({
   return (
     <SettingsProvider currency={profile.currency}>
       <SidebarProvider>
-        <AppSidebar side="right" variant="floating" />
+        <AppSidebar side="right" variant="floating" collapsible="icon" />
         <SidebarInset className="min-w-0">
           <NavHeader />
           <div className="flex min-w-0 flex-1 flex-col gap-4 p-4 pt-0">
