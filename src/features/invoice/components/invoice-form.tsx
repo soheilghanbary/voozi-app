@@ -1,15 +1,22 @@
 'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ORPCError } from '@orpc/client'
 import { Plus, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Controller, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { AmountField } from '@/components/amount-field'
 import { Button } from '@/components/ui/button'
+import {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxList,
+} from '@/components/ui/combobox'
 import {
   Field,
   FieldContent,
@@ -17,17 +24,11 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import type { Customer } from '@/features/customer/types'
 import { PRODUCT_UNITS, type Product } from '@/features/product/types'
+import { useCurrencyLabel } from '@/features/settings/components/settings-provider'
 import { api } from '@/server/orpc/client'
 import { INVOICE_TYPE, type InvoiceDetail, type InvoiceType } from '../types'
 import { numberFormatter } from '../utils/format'
@@ -35,8 +36,6 @@ import {
   type InvoiceFormValues,
   invoiceFormSchema,
 } from '../utils/invoice-schema'
-
-const NO_PRODUCT = '__none__'
 
 const emptyItem: InvoiceFormValues['items'][number] = {
   productId: null,
@@ -62,6 +61,9 @@ const convertToEnglishDigits = (str: string) => {
     .replace(/[٠-٩]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 1632))
 }
 
+const formatNumeric = (value: number) =>
+  value ? value.toLocaleString('en-US', { maximumFractionDigits: 2 }) : ''
+
 function NumericCell({
   value,
   onValueChange,
@@ -71,20 +73,36 @@ function NumericCell({
   onValueChange: (value: number) => void
   placeholder?: string
 }) {
+  const [text, setText] = useState(() => formatNumeric(value))
+  const [focused, setFocused] = useState(false)
+
+  useEffect(() => {
+    if (!focused) setText(formatNumeric(value))
+  }, [value, focused])
+
   return (
     <Input
       dir="ltr"
       inputMode="decimal"
       className="text-center tabular-nums"
       placeholder={placeholder}
-      value={
-        value ? value.toLocaleString('en-US', { maximumFractionDigits: 2 }) : ''
-      }
+      value={text}
+      onFocus={(event) => {
+        setFocused(true)
+        event.target.select()
+      }}
       onChange={(event) => {
         const english = convertToEnglishDigits(event.target.value)
-        const cleaned = english.replace(/[^0-9.]/g, '')
+        const cleaned = english
+          .replace(/[^0-9.]/g, '')
+          .replace(/(\..*)\./g, '$1')
+        setText(cleaned)
         const num = cleaned === '' ? 0 : Number(cleaned)
         onValueChange(Number.isFinite(num) ? num : 0)
+      }}
+      onBlur={() => {
+        setFocused(false)
+        setText(formatNumeric(value))
       }}
     />
   )
@@ -137,6 +155,7 @@ export function InvoiceForm({
   products: Product[]
 }) {
   const router = useRouter()
+  const currencyLabel = useCurrencyLabel()
 
   const {
     control,
@@ -164,14 +183,25 @@ export function InvoiceForm({
   )
 
   async function onSubmit(values: InvoiceFormValues) {
+    const items = values.items
+      .filter((item) => item.productId || (item.name?.trim() ?? '') !== '')
+      .map((item) => ({
+        productId: item.productId ?? null,
+        name: item.name?.trim() ?? '',
+        unit: item.unit?.trim() ?? '',
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        discount: item.discount,
+      }))
+    const payload = { ...values, items }
     try {
       if (invoice) {
-        await api.invoices.update({ id: invoice.id, ...values })
+        await api.invoices.update({ id: invoice.id, ...payload })
         toast.success('فاکتور با موفقیت ویرایش شد.')
         router.push('/dashboard/invoices')
         router.refresh()
       } else {
-        await api.invoices.create(values)
+        await api.invoices.create(payload)
         toast.success('فاکتور جدید با موفقیت ثبت شد.')
         router.push('/dashboard/invoices')
         router.refresh()
@@ -185,18 +215,52 @@ export function InvoiceForm({
     }
   }
 
+  const isLastIndex = (index: number) => index === items.length - 1
+
+  const appendTrailingBlankRow = (index: number) => {
+    if (isLastIndex(index)) append(emptyItem)
+  }
+
+  const hasTrailingBlankRow = () => {
+    const last = items?.[items.length - 1]
+    return Boolean(last && !last.productId && !last.name?.trim())
+  }
+
+  const focusName = (index: number) => {
+    if (index < 0) return
+    requestAnimationFrame(() => {
+      document
+        .getElementById(`invoice-item-name-${index}`)
+        ?.focus({ preventScroll: true })
+    })
+  }
+
+  function handleAddRow() {
+    if (hasTrailingBlankRow()) {
+      focusName(items.length - 1)
+      return
+    }
+    append(emptyItem)
+    focusName(items.length)
+  }
+
   function handleProductChange(itemIndex: number, productId: string | null) {
-    setValue(
-      `items.${itemIndex}.productId`,
-      productId === NO_PRODUCT ? null : productId
-    )
+    setValue(`items.${itemIndex}.productId`, productId)
     const product = products.find((item) => item.id === productId)
     if (product) {
       setValue(`items.${itemIndex}.name`, product.name)
       setValue(`items.${itemIndex}.unit`, PRODUCT_UNITS[product.unit].label)
       setValue(`items.${itemIndex}.unitPrice`, product.basePrice)
+      appendTrailingBlankRow(itemIndex)
     }
   }
+
+  const lineTotal = (index: number) =>
+    Math.max(
+      0,
+      (items?.[index]?.quantity || 0) * (items?.[index]?.unitPrice || 0) -
+        (items?.[index]?.discount || 0)
+    )
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
@@ -223,23 +287,34 @@ export function InvoiceForm({
               control={control}
               name="customerId"
               render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue>
-                      {(value) =>
-                        customers.find((customer) => customer.id === value)
-                          ?.name ?? 'انتخاب مشتری...'
-                      }
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {customers.map((customer) => (
-                      <SelectItem key={customer.id} value={customer.id}>
-                        {customer.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Combobox
+                  items={customers}
+                  itemToStringLabel={(customer) => customer.name}
+                  itemToStringValue={(customer) => customer.id}
+                  value={
+                    customers.find((customer) => customer.id === field.value) ??
+                    null
+                  }
+                  onValueChange={(customer) =>
+                    field.onChange(customer?.id ?? '')
+                  }
+                >
+                  <ComboboxInput
+                    placeholder="انتخاب مشتری..."
+                    aria-invalid={!!errors.customerId}
+                    onBlur={field.onBlur}
+                  />
+                  <ComboboxContent>
+                    <ComboboxEmpty>مشتری‌ای یافت نشد.</ComboboxEmpty>
+                    <ComboboxList>
+                      {(customer: Customer) => (
+                        <ComboboxItem key={customer.id} value={customer}>
+                          {customer.name}
+                        </ComboboxItem>
+                      )}
+                    </ComboboxList>
+                  </ComboboxContent>
+                </Combobox>
               )}
             />
             <FieldError>{errors.customerId?.message}</FieldError>
@@ -250,7 +325,7 @@ export function InvoiceForm({
           name="discount"
           render={({ field }) => (
             <AmountField
-              label="تخفیف (تومان)"
+              label={`تخفیف (${currencyLabel})`}
               value={field.value}
               onChange={field.onChange}
               onBlur={field.onBlur}
@@ -280,7 +355,7 @@ export function InvoiceForm({
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => append(emptyItem)}
+            onClick={handleAddRow}
           >
             <Plus />
             افزودن ردیف
@@ -304,35 +379,38 @@ export function InvoiceForm({
                     control={control}
                     name={`items.${index}.productId`}
                     render={({ field: productField }) => (
-                      <Select
-                        value={productField.value ?? null}
-                        onValueChange={(value) =>
-                          handleProductChange(index, value)
+                      <Combobox
+                        items={products}
+                        itemToStringLabel={(product) => product.name}
+                        itemToStringValue={(product) => product.id}
+                        value={
+                          products.find(
+                            (product) => product.id === productField.value
+                          ) ?? null
+                        }
+                        onValueChange={(product) =>
+                          handleProductChange(
+                            index,
+                            product ? product.id : null
+                          )
                         }
                       >
-                        <SelectTrigger className="w-full">
-                          <SelectValue>
-                            {(value) => {
-                              if (!value || value === NO_PRODUCT)
-                                return 'انتخاب...'
-                              return (
-                                products.find((product) => product.id === value)
-                                  ?.name ?? 'انتخاب...'
-                              )
-                            }}
-                          </SelectValue>
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value={NO_PRODUCT}>
-                            بدون انتخاب
-                          </SelectItem>
-                          {products.map((product) => (
-                            <SelectItem key={product.id} value={product.id}>
-                              {product.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                        <ComboboxInput
+                          placeholder="انتخاب کالا یا خدمت..."
+                          aria-invalid={!!errors.items?.[index]?.name}
+                          onBlur={productField.onBlur}
+                        />
+                        <ComboboxContent>
+                          <ComboboxEmpty>کالایی یافت نشد.</ComboboxEmpty>
+                          <ComboboxList>
+                            {(product: Product) => (
+                              <ComboboxItem key={product.id} value={product}>
+                                {product.name}
+                              </ComboboxItem>
+                            )}
+                          </ComboboxList>
+                        </ComboboxContent>
+                      </Combobox>
                     )}
                   />
                 </FieldContent>
@@ -340,10 +418,22 @@ export function InvoiceForm({
               <Field className="min-w-40 flex-1">
                 <FieldLabel>نام</FieldLabel>
                 <FieldContent>
-                  <Input
-                    placeholder="نام کالا یا خدمات"
-                    aria-invalid={!!errors.items?.[index]?.name}
-                    {...register(`items.${index}.name`)}
+                  <Controller
+                    control={control}
+                    name={`items.${index}.name`}
+                    render={({ field: nameField }) => (
+                      <Input
+                        id={`invoice-item-name-${index}`}
+                        placeholder="نام کالا یا خدمات"
+                        aria-invalid={!!errors.items?.[index]?.name}
+                        value={nameField.value ?? ''}
+                        onChange={(event) => {
+                          nameField.onChange(event)
+                          appendTrailingBlankRow(index)
+                        }}
+                        onBlur={nameField.onBlur}
+                      />
+                    )}
                   />
                   <FieldError>
                     {errors.items?.[index]?.name?.message}
@@ -417,6 +507,14 @@ export function InvoiceForm({
               >
                 <Trash2 />
               </Button>
+              <div className="flex w-full items-center justify-between border-t pt-2 text-sm">
+                <span className="text-muted-foreground">جمع ردیف</span>
+                <span className="font-medium tabular-nums">
+                  {lineTotal(index) > 0
+                    ? numberFormatter.format(lineTotal(index))
+                    : '—'}
+                </span>
+              </div>
             </div>
           ))}
         </div>
@@ -425,13 +523,13 @@ export function InvoiceForm({
       <div className="flex justify-end">
         <div className="w-full space-y-1 rounded-lg border p-4 text-sm sm:max-w-sm">
           <div className="flex justify-between">
-            <span>جمع کالاها</span>
+            <span>جمع کالاها ({currencyLabel})</span>
             <span className="tabular-nums">
               {numberFormatter.format(totals.subtotal)}
             </span>
           </div>
           <div className="flex justify-between">
-            <span>تخفیف</span>
+            <span>تخفیف ({currencyLabel})</span>
             <span className="tabular-nums">
               {numberFormatter.format(discount)}
             </span>
@@ -443,7 +541,7 @@ export function InvoiceForm({
             </span>
           </div>
           <div className="flex justify-between border-t pt-2 font-bold">
-            <span>جمع کل</span>
+            <span>جمع کل ({currencyLabel})</span>
             <span className="tabular-nums">
               {numberFormatter.format(totals.total)}
             </span>

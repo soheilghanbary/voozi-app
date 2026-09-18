@@ -1,3 +1,6 @@
+'use client'
+
+import { usePathname } from 'next/navigation'
 import { Notification3 } from 'reicon-react'
 import { ModeToggle } from './mode-toggle'
 import { Button } from './ui/button'
@@ -6,6 +9,13 @@ import { SidebarTrigger } from './ui/sidebar'
 import { UserMenu } from './user-menu'
 
 export const NavHeader = () => {
+  const pathname = usePathname()
+  const isInvoicePreview = /^\/dashboard\/invoices\/[^/]+$/.test(pathname)
+
+  if (isInvoicePreview) {
+    return null
+  }
+
   return (
     <header className="p-2">
       <nav className="flex items-center gap-x-2">

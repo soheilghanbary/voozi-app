@@ -4,19 +4,19 @@ import { randomUUID } from 'node:crypto'
 import { ORPCError } from '@orpc/server'
 import { and, desc, eq, inArray } from 'drizzle-orm'
 import { z } from 'zod'
-import { invoiceFormSchema } from '@/features/invoice/utils/invoice-schema'
+import { invoiceApiSchema } from '@/features/invoice/utils/invoice-schema'
 import { db } from '@/server/db'
 import { invoice, invoiceItem } from '@/server/db/schema'
 import { authed } from '@/server/orpc/context'
 
 const idOutput = z.object({ id: z.string() })
 
-const invoiceIdSchema = invoiceFormSchema.extend({
+const invoiceIdSchema = invoiceApiSchema.extend({
   id: z.string().min(1),
 })
 
 export const createInvoice = authed
-  .input(invoiceFormSchema)
+  .input(invoiceApiSchema)
   .output(idOutput)
   .handler(async ({ input, context }) => {
     const [created] = await db.transaction(async (tx) => {

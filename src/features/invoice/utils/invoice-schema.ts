@@ -3,10 +3,8 @@ import { INVOICE_TYPE, type InvoiceType } from '../types'
 
 const typeKeys = Object.keys(INVOICE_TYPE) as [InvoiceType, ...InvoiceType[]]
 
-export const invoiceItemFormSchema = z.object({
+const invoiceItemBaseSchema = z.object({
   productId: z.string().nullable().optional(),
-  name: z.string().trim().min(1, 'نام کالا یا خدمات را وارد کنید'),
-  unit: z.string().trim().min(1, 'واحد را وارد کنید'),
   quantity: z
     .number({ message: 'تعداد را وارد کنید' })
     .positive('تعداد باید بیشتر از صفر باشد'),
@@ -18,7 +16,17 @@ export const invoiceItemFormSchema = z.object({
     .min(0, 'تخفیف نمی‌تواند منفی باشد'),
 })
 
-export const invoiceFormSchema = z.object({
+export const invoiceItemFormSchema = invoiceItemBaseSchema.extend({
+  name: z.string().trim().optional(),
+  unit: z.string().trim().optional(),
+})
+
+export const invoiceItemApiSchema = invoiceItemBaseSchema.extend({
+  name: z.string().trim().min(1, 'نام کالا یا خدمات را وارد کنید'),
+  unit: z.string().trim().min(1, 'واحد را وارد کنید'),
+})
+
+const invoiceBaseSchema = z.object({
   type: z.enum(typeKeys, {
     message: 'نوع فاکتور را انتخاب کنید',
   }),
@@ -31,8 +39,45 @@ export const invoiceFormSchema = z.object({
     .min(0, 'درصد مالیات نمی‌تواند منفی باشد')
     .max(100, 'درصد مالیات حداکثر ۱۰۰ است'),
   note: z.string().trim().max(500, 'یادداشت حداکثر ۵۰۰ حرف باشد').optional(),
+})
+
+export const invoiceFormSchema = invoiceBaseSchema.extend({
+  items: z.array(invoiceItemFormSchema).superRefine((items, ctx) => {
+    const started = items.filter(
+      (item) => item.productId != null || item.name?.trim() !== ''
+    )
+    if (started.length === 0) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['items'],
+        message: 'حداقل یک ردیف به فاکتور اضافه کنید',
+      })
+      return
+    }
+    items.forEach((item, index) => {
+      const isStarted = item.productId != null || item.name?.trim() !== ''
+      if (!isStarted) return
+      if (item.name?.trim() === '') {
+        ctx.addIssue({
+          code: 'custom',
+          path: [index, 'name'],
+          message: 'نام کالا یا خدمات را وارد کنید',
+        })
+      }
+      if (item.unit?.trim() === '') {
+        ctx.addIssue({
+          code: 'custom',
+          path: [index, 'unit'],
+          message: 'واحد را وارد کنید',
+        })
+      }
+    })
+  }),
+})
+
+export const invoiceApiSchema = invoiceBaseSchema.extend({
   items: z
-    .array(invoiceItemFormSchema)
+    .array(invoiceItemApiSchema)
     .min(1, 'حداقل یک ردیف به فاکتور اضافه کنید'),
 })
 

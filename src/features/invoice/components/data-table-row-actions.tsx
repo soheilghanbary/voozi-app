@@ -1,7 +1,7 @@
 'use client'
 
 import { ORPCError } from '@orpc/client'
-import { EllipsisVertical, FileText, Pencil, Trash2 } from 'lucide-react'
+import { EllipsisVertical, Eye, FileText, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -69,6 +69,13 @@ export function DataTableRowActions({ invoice }: { invoice: Invoice }) {
           >
             <Pencil />
             ویرایش
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            nativeButton={false}
+            render={<Link href={`/dashboard/invoices/${invoice.id}`} />}
+          >
+            <Eye />
+            پیش‌نمایش
           </DropdownMenuItem>
           <DropdownMenuItem
             nativeButton={false}

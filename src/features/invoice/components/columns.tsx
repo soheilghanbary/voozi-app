@@ -1,6 +1,7 @@
 'use client'
 
 import { createColumnHelper } from '@tanstack/react-table'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { INVOICE_TYPE, type Invoice, type InvoiceType } from '../types'
@@ -35,11 +36,17 @@ export const columns = columnHelper.columns([
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="شماره" />
     ),
-    cell: ({ row }) => (
-      <div className="font-medium tabular-nums">
-        {numberFormatter.format(row.getValue<number>('number'))}
-      </div>
-    ),
+    cell: ({ row }) => {
+      const invoice = row.original as Invoice
+      return (
+        <Link
+          href={`/dashboard/invoices/${invoice.id}`}
+          className="font-medium text-primary tabular-nums underline-offset-4 hover:underline"
+        >
+          {numberFormatter.format(row.getValue<number>('number'))}
+        </Link>
+      )
+    },
     filterFn: 'invoiceSearch',
   }),
   columnHelper.accessor('customerName', {

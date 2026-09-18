@@ -4,6 +4,7 @@ import { getInvoice } from '@/features/invoice/api/queries'
 import { InvoicePrintDocument } from '@/features/invoice/components/invoice-print-document'
 import { PrintToolbar } from '@/features/invoice/components/print-toolbar'
 import type { InvoiceDetail } from '@/features/invoice/types'
+import { getBusinessProfile } from '@/features/settings/api/queries'
 
 export const instant = false
 
@@ -24,13 +25,15 @@ export default async function Page({
     throw error
   }
 
+  const profile = await call(getBusinessProfile)
+
   return (
     <div className="min-h-dvh py-8 print:bg-white print:py-0">
       <div className="mx-auto max-w-4xl px-4 print:max-w-none print:p-0">
         <div className="mb-4 print:hidden">
           <PrintToolbar />
         </div>
-        <InvoicePrintDocument invoice={invoice} />
+        <InvoicePrintDocument invoice={invoice} profile={profile} />
       </div>
     </div>
   )

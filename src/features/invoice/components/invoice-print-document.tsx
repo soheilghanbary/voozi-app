@@ -1,4 +1,7 @@
+// biome-ignore-all lint/performance/noImgElement: brand logo and signature are stored as data URLs in the database
+
 import { FileText } from 'lucide-react'
+
 import {
   Table,
   TableBody,
@@ -8,6 +11,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { appConfig } from '@/config'
+import { CURRENCY } from '@/features/settings/types'
 import { INVOICE_TYPE, type InvoiceDetail } from '../types'
 import { dateFormatter, numberFormatter } from '../utils/format'
 
@@ -31,13 +35,30 @@ function computeTotals(invoice: InvoiceDetail): {
   return { subtotal, afterDiscount, tax, grandTotal }
 }
 
-export function InvoicePrintDocument({ invoice }: { invoice: InvoiceDetail }) {
+export function InvoicePrintDocument({
+  invoice,
+  profile,
+}: {
+  invoice: InvoiceDetail
+  profile?: {
+    name?: string | null
+    title?: string | null
+    description?: string | null
+    logo?: string | null
+    signature?: string | null
+    currency?: 'rial' | 'toman' | null
+  } | null
+}) {
   const totals = computeTotals(invoice)
   const money = (value: number) => numberFormatter.format(value)
   const issueDate = dateFormatter.format(new Date(invoice.issueDate))
   const dueDate = invoice.dueDate
     ? dateFormatter.format(new Date(invoice.dueDate))
     : null
+
+  const brandName = profile?.name?.trim() || appConfig.name
+  const brandTitle = profile?.title?.trim()
+  const currency = profile?.currency ?? 'toman'
 
   return (
     <div className="mx-auto max-w-full overflow-hidden rounded-2xl bg-white text-zinc-900 ring-1 ring-zinc-200 print:w-auto print:max-w-none print:rounded-none print:shadow-none print:ring-0">
@@ -46,15 +67,24 @@ export function InvoicePrintDocument({ invoice }: { invoice: InvoiceDetail }) {
       <div className="px-10 pt-8 pb-10 print:px-4 print:pt-4 print:pb-4">
         <div className="flex items-start justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="grid size-12 place-items-center rounded-2xl border text-primary-foreground shadow-xs">
-              <FileText className="size-6 text-blue-500" />
-            </div>
+            {profile?.logo ? (
+              <img
+                src={profile.logo}
+                alt={brandName}
+                className="size-14 rounded-2xl object-contain"
+              />
+            ) : (
+              <div className="grid size-12 place-items-center rounded-2xl border text-primary-foreground shadow-xs">
+                <FileText className="size-6 text-blue-500" />
+              </div>
+            )}
             <div className="space-y-0.5">
               <p className="font-black text-lg text-zinc-900 leading-tight">
-                {appConfig.name}
+                {brandName}
               </p>
               <p className="text-xs text-zinc-500">
-                {invoice.type === 'invoice' ? 'فاکتور فروش' : 'پیش فاکتور'}
+                {brandTitle ??
+                  (invoice.type === 'invoice' ? 'فاکتور فروش' : 'پیش فاکتور')}
               </p>
             </div>
           </div>
@@ -181,7 +211,7 @@ export function InvoicePrintDocument({ invoice }: { invoice: InvoiceDetail }) {
           <div className="order-1 w-full max-w-xs sm:order-2">
             <div className="space-y-2.5 rounded-xl border border-zinc-200 bg-white p-5">
               <div className="flex items-center justify-between text-sm text-zinc-600">
-                <span>جمع</span>
+                <span>جمع ({CURRENCY[currency].label})</span>
                 <span className="tabular-nums">{money(totals.subtotal)}</span>
               </div>
               {invoice.discount > 0 && (
@@ -199,7 +229,7 @@ export function InvoicePrintDocument({ invoice }: { invoice: InvoiceDetail }) {
                 </div>
               )}
               <div className="flex items-center justify-between text-sm text-zinc-600">
-                <span>مبلغ نهایی</span>
+                <span>مبلغ نهایی ({CURRENCY[currency].label})</span>
                 <span className="font-black text-xl tabular-nums">
                   {money(totals.grandTotal)}
                 </span>
@@ -211,17 +241,32 @@ export function InvoicePrintDocument({ invoice }: { invoice: InvoiceDetail }) {
         {!invoice.note && (
           <div className="mt-8 flex items-end justify-end gap-8">
             <div className="w-36 border-zinc-300 border-b border-dashed pb-8 text-center">
+              {profile?.signature ? (
+                <img
+                  src={profile.signature}
+                  alt="امضا"
+                  className="mx-auto mb-1 max-h-16 w-auto object-contain"
+                />
+              ) : null}
               <span className="text-[11px] text-zinc-400">
                 امضا و مهر فروشنده
               </span>
             </div>
           </div>
         )}
+
+        <div className="mt-8 flex flex-col items-center gap-1 text-center">
+          {profile?.description && (
+            <p className="max-w-md text-[11px] text-zinc-400 leading-relaxed">
+              {profile.description}
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="border-zinc-100 border-t bg-zinc-50/60 px-10 py-4 text-center print:px-4">
         <p className="text-[11px] text-zinc-400">
-          سند صادره توسط {appConfig.name} — به صورت الکترونیکی صادر شده است
+          سند صادره توسط {brandName} — به صورت الکترونیکی صادر شده است
         </p>
       </div>
     </div>

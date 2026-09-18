@@ -17,6 +17,8 @@ import {
   updateProduct,
 } from '@/features/product/api/mutations'
 import { getProduct, listProducts } from '@/features/product/api/queries'
+import { updateBusinessProfile } from '@/features/settings/api/mutations'
+import { getBusinessProfile } from '@/features/settings/api/queries'
 
 export const router = {
   customers: {
@@ -40,5 +42,9 @@ export const router = {
     deleteMany: deleteManyInvoices,
     list: listInvoices,
     get: getInvoice,
+  },
+  settings: {
+    get: getBusinessProfile,
+    update: updateBusinessProfile,
   },
 }

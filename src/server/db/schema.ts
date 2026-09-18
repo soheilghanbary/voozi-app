@@ -189,3 +189,30 @@ export const invoiceItem = pgTable(
   },
   (table) => [index('invoice_item_invoiceId_idx').on(table.invoiceId)]
 )
+
+export const businessProfile = pgTable(
+  'business_profile',
+  {
+    userId: text('user_id')
+      .primaryKey()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    name: text('name'),
+    title: text('title'),
+    description: text('description'),
+    logo: text('logo'),
+    signature: text('signature'),
+    currency: text('currency', {
+      enum: ['rial', 'toman'],
+    })
+      .default('toman')
+      .notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index('business_profile_userId_idx').on(table.userId)]
+)
+
+export type BusinessProfileRow = typeof businessProfile.$inferSelect

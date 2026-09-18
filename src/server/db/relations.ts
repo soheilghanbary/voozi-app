@@ -1,6 +1,7 @@
 import { defineRelations } from 'drizzle-orm'
 import {
   account,
+  businessProfile,
   customer,
   invoice,
   invoiceItem,
@@ -18,6 +19,7 @@ export const relations = defineRelations(
     product,
     invoice,
     invoiceItem,
+    businessProfile,
   },
   (r) => ({
     user: {
@@ -26,6 +28,10 @@ export const relations = defineRelations(
       customers: r.many.customer(),
       products: r.many.product(),
       invoices: r.many.invoice(),
+      businessProfile: r.one.businessProfile({
+        from: r.user.id,
+        to: r.businessProfile.userId,
+      }),
     },
     session: {
       user: r.one.user({
