@@ -15,6 +15,7 @@ export type BusinessProfile = {
   tel: string | null
   website: string | null
   currency: Currency
+  completed: boolean
 }
 
 export const CURRENCY_LABELS = Object.fromEntries(

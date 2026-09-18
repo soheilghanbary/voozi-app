@@ -1,4 +1,5 @@
 import { call } from '@orpc/server'
+import { redirect } from 'next/navigation'
 import { AppSidebar } from '@/components/app-sidebar'
 import { NavHeader } from '@/components/nav-header'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
@@ -11,6 +12,10 @@ export default async function DashboardLayout({
   children,
 }: React.PropsWithChildren) {
   const profile = await call(getBusinessProfile)
+
+  if (!profile.completed) {
+    redirect('/onboarding')
+  }
 
   return (
     <SettingsProvider currency={profile.currency}>

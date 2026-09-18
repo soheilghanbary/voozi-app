@@ -17,6 +17,7 @@ const output = z.object({
   tel: z.string().nullable(),
   website: z.string().nullable(),
   currency: z.enum(['rial', 'toman']),
+  completed: z.boolean(),
 })
 
 export const getBusinessProfile = authed
@@ -40,6 +41,7 @@ export const getBusinessProfile = authed
         tel: null,
         website: null,
         currency: 'toman',
+        completed: false,
       }
     }
 
@@ -53,5 +55,6 @@ export const getBusinessProfile = authed
       tel: row.tel,
       website: row.website,
       currency: row.currency,
+      completed: Boolean(row.name?.trim()),
     }
   })
