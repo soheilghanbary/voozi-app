@@ -1,10 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ORPCError } from '@orpc/client'
-import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
-import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   Field,
@@ -15,7 +12,6 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
-import { api } from '@/server/orpc/client'
 import type { Note } from '../types'
 import {
   NOTE_COLOR_LABELS,
@@ -40,17 +36,18 @@ function toFormValues(note: Note): NoteFormValues {
 
 export function NoteForm({
   note,
+  onSubmit,
   onSaved,
   onCancelled,
 }: {
   note?: Note
+  onSubmit: (values: NoteFormValues) => void
   onSaved?: () => void
   onCancelled?: () => void
 }) {
-  const router = useRouter()
   const {
     register,
-    handleSubmit,
+    handleSubmit: rhfSubmit,
     watch,
     setValue,
     formState: { errors, isSubmitting },
@@ -61,28 +58,13 @@ export function NoteForm({
 
   const color = watch('color')
 
-  async function onSubmit(values: NoteFormValues) {
-    try {
-      if (note) {
-        await api.notes.update({ id: note.id, ...values })
-        toast.success('یادداشت با موفقیت ویرایش شد.')
-      } else {
-        await api.notes.create(values)
-        toast.success('یادداشت جدید با موفقیت ثبت شد.')
-      }
-      router.refresh()
-      onSaved?.()
-    } catch (error) {
-      if (error instanceof ORPCError && error.code === 'NOT_FOUND') {
-        toast.error('این یادداشت یافت نشد.')
-      } else {
-        toast.error('ثبت یادداشت ناموفق بود. دوباره تلاش کنید.')
-      }
-    }
+  function handleSubmit(values: NoteFormValues) {
+    onSubmit(values)
+    onSaved?.()
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+    <form onSubmit={rhfSubmit(handleSubmit)} className="space-y-5">
       <Field>
         <FieldLabel>عنوان</FieldLabel>
         <FieldContent>

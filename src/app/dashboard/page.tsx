@@ -1,7 +1,9 @@
 import { call } from '@orpc/server'
 import {
   Banknote,
+  Check,
   ChevronLeft,
+  ListTodo,
   Package,
   Plus,
   ReceiptText,
@@ -19,11 +21,21 @@ import type { Customer } from '@/features/customer/types'
 import { listInvoices } from '@/features/invoice/api/queries'
 import type { Invoice } from '@/features/invoice/types'
 import { dateFormatter, numberFormatter } from '@/features/invoice/utils/format'
+import { listNotes } from '@/features/note/api/queries'
+import type { Note } from '@/features/note/types'
+import { dateFormatter as noteDateFormatter } from '@/features/note/utils/format'
+import { NOTE_COLOR_STYLES } from '@/features/note/utils/note-colors'
 import { listProducts } from '@/features/product/api/queries'
 import { QuickAddProductCard } from '@/features/product/components/quick-add-product-card'
 import type { Product } from '@/features/product/types'
 import { getBusinessProfile } from '@/features/settings/api/queries'
 import { type BusinessProfile, CURRENCY } from '@/features/settings/types'
+import { listTasks } from '@/features/task/api/queries'
+import type { Task } from '@/features/task/types'
+import {
+  PRIORITY_LABELS,
+  PRIORITY_STYLES,
+} from '@/features/task/utils/task-priority'
 import { cn } from '@/lib/utils'
 
 export const instant = false
@@ -37,6 +49,8 @@ const money = (value: number) => numberFormatter.format(value)
 type InvoicesPromise = Promise<Invoice[]>
 type CustomersPromise = Promise<Customer[]>
 type ProductsPromise = Promise<Product[]>
+type TasksPromise = Promise<Task[]>
+type NotesPromise = Promise<Note[]>
 type ProfilePromise = Promise<BusinessProfile>
 
 function StatCard({
@@ -77,8 +91,8 @@ function StatCard({
 
 function StatCardsSkeleton() {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-      {Array.from({ length: 4 }).map((_, index) => (
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+      {Array.from({ length: 5 }).map((_, index) => (
         <div key={index} className="space-y-3 rounded-lg border p-4">
           <div className="h-3 w-20 animate-pulse rounded bg-muted" />
           <div className="h-7 w-28 animate-pulse rounded bg-muted" />
@@ -113,19 +127,39 @@ function SalesOverviewSkeleton() {
   )
 }
 
+function RecentActivitySkeleton() {
+  return (
+    <div className="grid gap-4 xl:grid-cols-2">
+      {Array.from({ length: 2 }).map((_, index) => (
+        <div key={index} className="space-y-3 rounded-lg border p-5">
+          <div className="h-5 w-28 animate-pulse rounded bg-muted" />
+          {Array.from({ length: 4 }).map((_, rowIndex) => (
+            <div
+              key={rowIndex}
+              className="h-10 animate-pulse rounded-lg bg-muted/60"
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  )
+}
+
 async function StatCardsSection({
   invoices,
   customers,
   products,
+  tasks,
   profile,
 }: {
   invoices: InvoicesPromise
   customers: CustomersPromise
   products: ProductsPromise
+  tasks: TasksPromise
   profile: ProfilePromise
 }) {
-  const [invoicesData, customersData, productsData, profileData] =
-    await Promise.all([invoices, customers, products, profile])
+  const [invoicesData, customersData, productsData, tasksData, profileData] =
+    await Promise.all([invoices, customers, products, tasks, profile])
 
   const currencyLabel = CURRENCY[profileData.currency].label
   const invoiceCount = invoicesData.filter((i) => i.type === 'invoice').length
@@ -133,9 +167,11 @@ async function StatCardsSection({
   const invoiceTotal = invoicesData
     .filter((i) => i.type === 'invoice')
     .reduce((sum, i) => sum + i.total, 0)
+  const openTasks = tasksData.filter((t) => !t.completedAt).length
+  const doneTasks = tasksData.filter((t) => !!t.completedAt).length
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
       <StatCard
         label={`فروش کل (${currencyLabel})`}
         value={money(invoiceTotal)}
@@ -161,6 +197,13 @@ async function StatCardsSection({
         value={money(productsData.length)}
         icon={<Package className="size-5 text-amber-600" />}
         accent="bg-amber-600/10 text-amber-600"
+      />
+      <StatCard
+        label="وظایف"
+        value={money(openTasks)}
+        sub={`${money(doneTasks)} تکمیل‌شده از ${money(tasksData.length)}`}
+        icon={<ListTodo className="size-5 text-sky-600" />}
+        accent="bg-sky-600/10 text-sky-600"
       />
     </div>
   )
@@ -324,6 +367,152 @@ async function SalesOverviewSection({
   )
 }
 
+async function RecentActivitySection({
+  tasks,
+  notes,
+}: {
+  tasks: TasksPromise
+  notes: NotesPromise
+}) {
+  const [tasksData, notesData] = await Promise.all([tasks, notes])
+
+  const recentTasks = tasksData.slice(0, 4)
+  const recentNotes = notesData.slice(0, 4)
+
+  return (
+    <div className="grid gap-4 xl:grid-cols-2">
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base">آخرین وظایف</CardTitle>
+          <Button
+            size="sm"
+            variant="ghost"
+            nativeButton={false}
+            render={<Link href="/dashboard/tasks" />}
+          >
+            مشاهده همه
+            <ChevronLeft />
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-1">
+          {recentTasks.length ? (
+            recentTasks.map((task) => {
+              const completed = !!task.completedAt
+              return (
+                <Link
+                  key={task.id}
+                  href="/dashboard/tasks"
+                  className="group flex items-center gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-muted/60"
+                >
+                  <span
+                    className={cn(
+                      'grid size-5 shrink-0 place-items-center rounded-full border-2 transition-colors',
+                      completed
+                        ? PRIORITY_STYLES[task.priority].toggle
+                        : 'border-input'
+                    )}
+                  >
+                    {completed && (
+                      <Check className="size-3" strokeWidth={3.5} />
+                    )}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span
+                      className={cn(
+                        'block truncate font-medium text-sm',
+                        completed && 'text-muted-foreground line-through'
+                      )}
+                    >
+                      {task.title}
+                    </span>
+                    {task.description && (
+                      <span className="block truncate text-muted-foreground text-xs">
+                        {task.description}
+                      </span>
+                    )}
+                  </span>
+                  <span
+                    className={cn(
+                      'inline-flex shrink-0 items-center gap-1.5 rounded-full px-2.5 py-0.5 font-medium text-xs ring-1 ring-inset',
+                      PRIORITY_STYLES[task.priority].badge
+                    )}
+                  >
+                    <span
+                      aria-hidden
+                      className={cn(
+                        'size-1.5 rounded-full',
+                        PRIORITY_STYLES[task.priority].dot
+                      )}
+                    />
+                    {PRIORITY_LABELS[task.priority]}
+                  </span>
+                </Link>
+              )
+            })
+          ) : (
+            <EmptyActivityRow text="هنوز وظیفه‌ای ثبت نشده است" />
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle className="text-base">آخرین یادداشت‌ها</CardTitle>
+          <Button
+            size="sm"
+            variant="ghost"
+            nativeButton={false}
+            render={<Link href="/dashboard/notes" />}
+          >
+            مشاهده همه
+            <ChevronLeft />
+          </Button>
+        </CardHeader>
+        <CardContent className="space-y-1">
+          {recentNotes.length ? (
+            recentNotes.map((note) => (
+              <Link
+                key={note.id}
+                href="/dashboard/notes"
+                className="group flex items-center gap-3 rounded-lg px-2 py-2.5 transition-colors hover:bg-muted/60"
+              >
+                <span
+                  aria-hidden
+                  className={cn(
+                    'h-7 w-1 shrink-0 rounded-full',
+                    NOTE_COLOR_STYLES[note.color].edge.replace('border-', 'bg-')
+                  )}
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-medium text-sm">
+                    {note.title}
+                  </span>
+                  <span className="block truncate text-muted-foreground text-xs">
+                    {note.content || 'بدون متن'}
+                  </span>
+                </span>
+                <span className="shrink-0 text-muted-foreground text-xs tabular-nums">
+                  {noteDateFormatter.format(new Date(note.updatedAt))}
+                </span>
+              </Link>
+            ))
+          ) : (
+            <EmptyActivityRow text="هنوز یادداشتی ثبت نشده است" />
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  )
+}
+
+function EmptyActivityRow({ text }: { text: string }) {
+  return (
+    <div className="flex items-center justify-center rounded-lg px-2 py-8 text-muted-foreground text-sm">
+      {text}
+    </div>
+  )
+}
+
 function QuickActionsSection() {
   const quickActions = [
     {
@@ -363,6 +552,8 @@ export default async function Page() {
   const invoices = Promise.resolve(call(listInvoices))
   const customers = Promise.resolve(call(listCustomers))
   const products = Promise.resolve(call(listProducts))
+  const tasks = Promise.resolve(call(listTasks))
+  const notes = Promise.resolve(call(listNotes))
   const profile = Promise.resolve(call(getBusinessProfile))
 
   return (
@@ -385,12 +576,17 @@ export default async function Page() {
           invoices={invoices}
           customers={customers}
           products={products}
+          tasks={tasks}
           profile={profile}
         />
       </Suspense>
 
       <Suspense fallback={<SalesOverviewSkeleton />}>
         <SalesOverviewSection invoices={invoices} profile={profile} />
+      </Suspense>
+
+      <Suspense fallback={<RecentActivitySkeleton />}>
+        <RecentActivitySection tasks={tasks} notes={notes} />
       </Suspense>
 
       <QuickActionsSection />

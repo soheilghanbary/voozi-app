@@ -1,35 +1,19 @@
 import { call } from '@orpc/server'
-import { Plus } from 'lucide-react'
 import { Suspense } from 'react'
-import { PageHeader } from '@/components/page-header'
-import { Button } from '@/components/ui/button'
 import { listNotes } from '@/features/note/api/queries'
-import { NoteFormDialog } from '@/features/note/components/note-form-dialog'
-import { NotesGrid } from '@/features/note/components/notes-grid'
+import { NotesPageClient } from '@/features/note/components/notes-page'
 
 export default function Page() {
   return (
-    <div className="space-y-4">
-      <PageHeader title="یادداشت‌ها">
-        <NoteFormDialog
-          trigger={
-            <Button>
-              <Plus />
-              یادداشت جدید
-            </Button>
-          }
-        />
-      </PageHeader>
-      <Suspense fallback={<NotesGridSkeleton />}>
-        <NotesTable />
-      </Suspense>
-    </div>
+    <Suspense fallback={<NotesGridSkeleton />}>
+      <NotesSection />
+    </Suspense>
   )
 }
 
-async function NotesTable() {
+async function NotesSection() {
   const notes = await call(listNotes)
-  return <NotesGrid notes={notes} />
+  return <NotesPageClient notes={notes} />
 }
 
 function NotesGridSkeleton() {

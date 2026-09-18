@@ -9,25 +9,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import type { Note } from '../types'
-import type { NoteFormValues } from '../utils/note-schema'
-import { NoteForm } from './note-form'
+import type { Task } from '../types'
+import type { TaskFormValues } from '../utils/task-schema'
+import { TaskForm } from './task-form'
 
-type NoteFormDialogProps = {
-  note?: Note
+type TaskFormDialogProps = {
+  task?: Task
   trigger?: ReactElement
   open?: boolean
   onOpenChange?: (open: boolean) => void
-  onSubmit: (values: NoteFormValues) => void
+  onSubmit: (values: TaskFormValues) => void
 }
 
-export function NoteFormDialog({
-  note,
+export function TaskFormDialog({
+  task,
   trigger,
   open,
   onOpenChange,
   onSubmit,
-}: NoteFormDialogProps) {
+}: TaskFormDialogProps) {
   const [openState, setOpenState] = useState(false)
   const isControlled = open !== undefined
 
@@ -44,16 +44,16 @@ export function NoteFormDialog({
       {trigger && <DialogTrigger render={trigger} />}
       <DialogContent className="max-h-[calc(100dvh-4rem)] overflow-y-auto sm:max-w-xl">
         <DialogHeader>
-          <DialogTitle>{note ? 'ویرایش یادداشت' : 'یادداشت جدید'}</DialogTitle>
+          <DialogTitle>{task ? 'ویرایش وظیفه' : 'وظیفه جدید'}</DialogTitle>
           <DialogDescription>
-            {note
-              ? `ویرایش «${note.title}» و ذخیره تغییرات.`
-              : 'یادداشت جدید را ثبت کنید.'}
+            {task
+              ? `ویرایش «${task.title}» و ذخیره تغییرات.`
+              : 'وظیفه جدید را ثبت کنید.'}
           </DialogDescription>
         </DialogHeader>
-        <NoteForm
-          key={note?.id ?? 'new'}
-          note={note}
+        <TaskForm
+          key={task?.id ?? 'new'}
+          task={task}
           onSubmit={onSubmit}
           onSaved={() => handleOpenChange(false)}
           onCancelled={() => handleOpenChange(false)}

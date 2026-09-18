@@ -1,7 +1,15 @@
 'use client'
 
 import type * as React from 'react'
-import { Box2, ChartPie, Gear, Invoice, Stickynote, Users2 } from 'reicon-react'
+import {
+  Box2,
+  ChartPie,
+  Gear,
+  Invoice,
+  Stickynote,
+  Tasks,
+  Users2,
+} from 'reicon-react'
 import { Logo } from '@/assets/logo'
 import { NavMain } from '@/components/nav-main'
 import { NavUser } from '@/components/nav-user'
@@ -40,6 +48,11 @@ export const menus = [
     href: '/dashboard/notes',
     title: 'یادداشت‌ها',
     icon: <Stickynote />,
+  },
+  {
+    href: '/dashboard/tasks',
+    title: 'وظایف',
+    icon: <Tasks />,
   },
   {
     href: '/dashboard/settings',

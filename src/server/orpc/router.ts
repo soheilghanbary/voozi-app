@@ -25,6 +25,13 @@ import {
 import { getProduct, listProducts } from '@/features/product/api/queries'
 import { updateBusinessProfile } from '@/features/settings/api/mutations'
 import { getBusinessProfile } from '@/features/settings/api/queries'
+import {
+  createTask,
+  deleteTask,
+  setTaskCompleted,
+  updateTask,
+} from '@/features/task/api/mutations'
+import { getTask, listTasks } from '@/features/task/api/queries'
 
 export const router = {
   customers: {
@@ -47,6 +54,14 @@ export const router = {
     delete: deleteNote,
     list: listNotes,
     get: getNote,
+  },
+  tasks: {
+    create: createTask,
+    update: updateTask,
+    delete: deleteTask,
+    setCompleted: setTaskCompleted,
+    list: listTasks,
+    get: getTask,
   },
   invoices: {
     create: createInvoice,

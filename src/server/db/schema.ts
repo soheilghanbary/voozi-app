@@ -9,6 +9,7 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
 import { NOTE_COLORS } from '@/features/note/utils/note-colors'
+import { PRIORITIES } from '@/features/task/utils/task-priority'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -155,6 +156,30 @@ export const note = pgTable(
       .notNull(),
   },
   (table) => [index('note_userId_idx').on(table.userId)]
+)
+
+export const task = pgTable(
+  'task',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').references(() => user.id, {
+      onDelete: 'cascade',
+    }),
+    title: text('title').notNull(),
+    description: text('description'),
+    priority: text('priority', {
+      enum: [...PRIORITIES],
+    })
+      .default('medium')
+      .notNull(),
+    completedAt: timestamp('completed_at'),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index('task_userId_idx').on(table.userId)]
 )
 
 export const invoice = pgTable(

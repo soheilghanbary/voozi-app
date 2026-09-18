@@ -1,6 +1,5 @@
 'use client'
 
-import { ORPCError } from '@orpc/client'
 import {
   EllipsisVertical,
   Pencil,
@@ -8,9 +7,7 @@ import {
   StickyNote,
   Trash2,
 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -27,36 +24,31 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { cn } from '@/lib/utils'
-import { api } from '@/server/orpc/client'
 import type { Note } from '../types'
 import { dateFormatter } from '../utils/format'
 import { NOTE_COLOR_STYLES } from '../utils/note-colors'
+import type { NoteFormValues } from '../utils/note-schema'
 import { NoteFormDialog } from './note-form-dialog'
 
-function NoteCard({ note }: { note: Note }) {
-  const router = useRouter()
+type NotesGridProps = {
+  notes: Note[]
+  onCreate: (values: NoteFormValues) => void
+  onEdit: (id: string, values: NoteFormValues) => void
+  onDelete: (id: string) => void
+}
+
+function NoteCard({
+  note,
+  onEdit,
+  onDelete,
+}: {
+  note: Note
+  onEdit: (id: string, values: NoteFormValues) => void
+  onDelete: (id: string) => void
+}) {
   const accent = NOTE_COLOR_STYLES[note.color]
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  async function handleDelete() {
-    setIsDeleting(true)
-    try {
-      await api.notes.delete({ id: note.id })
-      toast.success('یادداشت با موفقیت حذف شد.')
-      setDeleteOpen(false)
-      router.refresh()
-    } catch (error) {
-      if (error instanceof ORPCError && error.code === 'NOT_FOUND') {
-        toast.error('این یادداشت یافت نشد.')
-      } else {
-        toast.error('حذف یادداشت ناموفق بود. دوباره تلاش کنید.')
-      }
-    } finally {
-      setIsDeleting(false)
-    }
-  }
 
   return (
     <div
@@ -119,7 +111,12 @@ function NoteCard({ note }: { note: Note }) {
         </span>
       </div>
 
-      <NoteFormDialog note={note} open={editOpen} onOpenChange={setEditOpen} />
+      <NoteFormDialog
+        note={note}
+        open={editOpen}
+        onOpenChange={setEditOpen}
+        onSubmit={(values) => onEdit(note.id, values)}
+      />
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>
@@ -130,19 +127,17 @@ function NoteCard({ note }: { note: Note }) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button
-              variant="outline"
-              disabled={isDeleting}
-              onClick={() => setDeleteOpen(false)}
-            >
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
               انصراف
             </Button>
             <Button
               variant="destructive"
-              disabled={isDeleting}
-              onClick={handleDelete}
+              onClick={() => {
+                onDelete(note.id)
+                setDeleteOpen(false)
+              }}
             >
-              {isDeleting ? 'در حال حذف…' : 'حذف'}
+              حذف
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -151,7 +146,11 @@ function NoteCard({ note }: { note: Note }) {
   )
 }
 
-function EmptyState() {
+function EmptyState({
+  onCreate,
+}: {
+  onCreate: (values: NoteFormValues) => void
+}) {
   return (
     <div className="rounded-2xl border border-dashed p-14 text-center">
       <div className="mx-auto grid size-12 place-items-center rounded-xl bg-muted text-muted-foreground">
@@ -163,6 +162,7 @@ function EmptyState() {
       </p>
       <div className="mt-6 flex justify-center">
         <NoteFormDialog
+          onSubmit={onCreate}
           trigger={
             <Button>
               <Plus />
@@ -175,15 +175,25 @@ function EmptyState() {
   )
 }
 
-export function NotesGrid({ notes }: { notes: Note[] }) {
+export function NotesGrid({
+  notes,
+  onCreate,
+  onEdit,
+  onDelete,
+}: NotesGridProps) {
   if (!notes.length) {
-    return <EmptyState />
+    return <EmptyState onCreate={onCreate} />
   }
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {notes.map((note) => (
-        <NoteCard key={note.id} note={note} />
+        <NoteCard
+          key={note.id}
+          note={note}
+          onEdit={onEdit}
+          onDelete={onDelete}
+        />
       ))}
     </div>
   )
