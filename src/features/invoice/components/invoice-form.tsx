@@ -578,18 +578,7 @@ export function InvoiceForm({
                           <ComboboxList>
                             {(product: Product) => (
                               <ComboboxItem key={product.id} value={product}>
-                                <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
-                                  <span className="truncate">
-                                    {product.name}
-                                  </span>
-                                  <span
-                                    className="shrink-0 text-muted-foreground text-xs tabular-nums"
-                                    dir="ltr"
-                                  >
-                                    {money(product.basePrice)}{' '}
-                                    {PRODUCT_UNITS[product.unit].label}
-                                  </span>
-                                </div>
+                                {product.name}
                               </ComboboxItem>
                             )}
                           </ComboboxList>
