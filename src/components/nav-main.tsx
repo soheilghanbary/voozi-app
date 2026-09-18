@@ -30,6 +30,7 @@ export function NavMain({ items }: Props) {
             <SidebarMenuButton
               size={'md'}
               isActive={pathname === item.href}
+              tooltip={item.title}
               onClick={() => {
                 if (isMobile) setOpenMobile(false)
               }}
@@ -40,33 +41,6 @@ export function NavMain({ items }: Props) {
             </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
-        {/* {items.map((item) => (
-          <Collapsible
-            key={item.title}
-            defaultOpen={item.isActive}
-            className="group/collapsible"
-            render={<SidebarMenuItem />}
-          >
-            <CollapsibleTrigger
-              render={<SidebarMenuButton tooltip={item.title} />}
-            >
-              {item.icon}
-              <span>{item.title}</span>
-              <ChevronRightIcon className="ms-auto transition-transform duration-200 group-data-open/collapsible:rotate-90" />
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <SidebarMenuSub>
-                {item.items?.map((subItem) => (
-                  <SidebarMenuSubItem key={subItem.title}>
-                    <SidebarMenuSubButton render={<a href={subItem.url} />}>
-                      <span>{subItem.title}</span>
-                    </SidebarMenuSubButton>
-                  </SidebarMenuSubItem>
-                ))}
-              </SidebarMenuSub>
-            </CollapsibleContent>
-          </Collapsible>
-        ))} */}
       </SidebarMenu>
     </SidebarGroup>
   )

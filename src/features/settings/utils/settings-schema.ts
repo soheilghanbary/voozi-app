@@ -16,6 +16,9 @@ export const businessProfileFormSchema = z.object({
     .optional(),
   logo: dataUrl('لوگو'),
   signature: dataUrl('امضا'),
+  phone: z.string().trim().max(20, 'شماره تماس حداکثر ۲۰ حرف باشد').optional(),
+  tel: z.string().trim().max(20, 'تلفن ثابت حداکثر ۲۰ حرف باشد').optional(),
+  website: z.string().trim().max(80, 'وب‌سایت حداکثر ۸۰ حرف باشد').optional(),
   currency: z.enum(typeKeys).optional(),
 })
 

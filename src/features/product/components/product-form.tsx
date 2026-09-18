@@ -176,7 +176,6 @@ export function ProductForm({ product }: { product?: Product }) {
               label="قیمت پایه (تومان)"
               value={field.value}
               onChange={field.onChange}
-              onBlur={field.onBlur}
               error={errors.basePrice?.message}
             />
           )}

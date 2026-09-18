@@ -36,7 +36,7 @@ export default async function Page({
   const profile = await call(getBusinessProfile)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 py-4">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div className="flex items-center gap-2">
           <Button

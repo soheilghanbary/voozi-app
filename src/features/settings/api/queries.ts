@@ -13,6 +13,9 @@ const output = z.object({
   description: z.string().nullable(),
   logo: z.string().nullable(),
   signature: z.string().nullable(),
+  phone: z.string().nullable(),
+  tel: z.string().nullable(),
+  website: z.string().nullable(),
   currency: z.enum(['rial', 'toman']),
 })
 
@@ -33,6 +36,9 @@ export const getBusinessProfile = authed
         description: null,
         logo: null,
         signature: null,
+        phone: null,
+        tel: null,
+        website: null,
         currency: 'toman',
       }
     }
@@ -43,6 +49,9 @@ export const getBusinessProfile = authed
       description: row.description,
       logo: row.logo,
       signature: row.signature,
+      phone: row.phone,
+      tel: row.tel,
+      website: row.website,
       currency: row.currency,
     }
   })

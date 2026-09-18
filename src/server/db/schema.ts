@@ -201,6 +201,9 @@ export const businessProfile = pgTable(
     description: text('description'),
     logo: text('logo'),
     signature: text('signature'),
+    phone: text('phone'),
+    tel: text('tel'),
+    website: text('website'),
     currency: text('currency', {
       enum: ['rial', 'toman'],
     })

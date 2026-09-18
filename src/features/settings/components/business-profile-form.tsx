@@ -133,6 +133,9 @@ export function BusinessProfileForm({ profile }: { profile: BusinessProfile }) {
       description: profile.description ?? '',
       logo: profile.logo ?? '',
       signature: profile.signature ?? '',
+      phone: profile.phone ?? '',
+      tel: profile.tel ?? '',
+      website: profile.website ?? '',
     },
   })
 
@@ -179,6 +182,29 @@ export function BusinessProfileForm({ profile }: { profile: BusinessProfile }) {
         placeholder="مثلاً: فروش عمده و خرده"
         error={errors.title?.message}
         {...register('title')}
+      />
+      <TextField
+        label="تلفن همراه"
+        placeholder="مثلاً: ۰۹۱۲۳۴۵۶۷۸۹"
+        inputMode="tel"
+        error={errors.phone?.message}
+        {...register('phone')}
+      />
+      <TextField
+        label="تلفن ثابت"
+        placeholder="مثلاً: ۰۲۱-۱۲۳۴۵۶۷۸"
+        inputMode="tel"
+        error={errors.tel?.message}
+        {...register('tel')}
+      />
+      <TextField
+        label="وب‌سایت"
+        placeholder="https://example.com"
+        inputMode="url"
+        dir="ltr"
+        className="sm:col-span-2"
+        error={errors.website?.message}
+        {...register('website')}
       />
       <div className="grid gap-2 sm:col-span-2">
         <label className="font-medium text-sm">توضیحات</label>

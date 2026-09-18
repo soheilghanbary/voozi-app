@@ -16,6 +16,9 @@ export const updateBusinessProfile = authed
     if (input.description !== undefined) set.description = input.description
     if (input.logo !== undefined) set.logo = input.logo
     if (input.signature !== undefined) set.signature = input.signature
+    if (input.phone !== undefined) set.phone = input.phone
+    if (input.tel !== undefined) set.tel = input.tel
+    if (input.website !== undefined) set.website = input.website
     if (input.currency !== undefined) set.currency = input.currency
 
     await db

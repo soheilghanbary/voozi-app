@@ -11,6 +11,9 @@ export type BusinessProfile = {
   description: string | null
   logo: string | null
   signature: string | null
+  phone: string | null
+  tel: string | null
+  website: string | null
   currency: Currency
 }
 

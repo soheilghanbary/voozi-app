@@ -1,6 +1,6 @@
 // biome-ignore-all lint/performance/noImgElement: brand logo and signature are stored as data URLs in the database
 
-import { FileText } from 'lucide-react'
+import { FileText, Globe, Phone, Smartphone } from 'lucide-react'
 
 import {
   Table,
@@ -46,6 +46,9 @@ export function InvoicePrintDocument({
     description?: string | null
     logo?: string | null
     signature?: string | null
+    phone?: string | null
+    tel?: string | null
+    website?: string | null
     currency?: 'rial' | 'toman' | null
   } | null
 }) {
@@ -64,14 +67,14 @@ export function InvoicePrintDocument({
     <div className="mx-auto max-w-full overflow-hidden rounded-2xl bg-white text-zinc-900 ring-1 ring-zinc-200 print:w-auto print:max-w-none print:rounded-none print:shadow-none print:ring-0">
       <div className="h-1.5 bg-linear-to-l from-primary via-primary/60 to-primary/10" />
 
-      <div className="px-10 pt-8 pb-10 print:px-4 print:pt-4 print:pb-4">
-        <div className="flex items-start justify-between gap-6">
+      <div className="px-4 pt-8 pb-10 sm:px-10 print:px-4 print:pt-4 print:pb-4">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
           <div className="flex items-center gap-3">
             {profile?.logo ? (
               <img
                 src={profile.logo}
                 alt={brandName}
-                className="size-14 rounded-2xl object-contain"
+                className="size-12 rounded-2xl object-contain sm:size-14"
               />
             ) : (
               <div className="grid size-12 place-items-center rounded-2xl border text-primary-foreground shadow-xs">
@@ -86,13 +89,44 @@ export function InvoicePrintDocument({
                 {brandTitle ??
                   (invoice.type === 'invoice' ? 'فاکتور فروش' : 'پیش فاکتور')}
               </p>
+              {(profile?.phone || profile?.tel || profile?.website) && (
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-0.5">
+                  {profile?.phone && (
+                    <span
+                      className="inline-flex items-center gap-1 text-[11px] text-zinc-400 tabular-nums"
+                      dir="ltr"
+                    >
+                      <Smartphone className="size-3" />
+                      {profile.phone}
+                    </span>
+                  )}
+                  {profile?.tel && (
+                    <span
+                      className="inline-flex items-center gap-1 text-[11px] text-zinc-400 tabular-nums"
+                      dir="ltr"
+                    >
+                      <Phone className="size-3" />
+                      {profile.tel}
+                    </span>
+                  )}
+                  {profile?.website && (
+                    <span
+                      className="inline-flex items-center gap-1 text-[11px] text-zinc-400 tabular-nums"
+                      dir="ltr"
+                    >
+                      <Globe className="size-3" />
+                      {profile.website}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           <div className="text-end">
-            <p className="font-black text-2xl text-zinc-900 tracking-tight">
+            <p className="text-center font-black text-2xl text-zinc-900 tracking-tight sm:text-end">
               {INVOICE_TYPE[invoice.type].label}
             </p>
-            <div className="mt-1.5 inline-flex items-center gap-2 rounded-full bg-zinc-100 px-3 py-1">
+            <div className="mt-1.5 inline-flex items-center justify-center gap-2 rounded-full bg-zinc-100 px-3 py-1 sm:justify-start">
               <span className="text-xs text-zinc-500">شماره سند</span>
               <span className="font-bold text-sm text-zinc-900 tabular-nums">
                 {money(invoice.number)}
@@ -122,7 +156,7 @@ export function InvoicePrintDocument({
             </p>
             <p className="font-bold text-sm text-zinc-900">{dueDate ?? '—'}</p>
           </div>
-          <div className="rounded-xl bg-primary/5 p-3.5 ring-1 ring-primary/10">
+          <div className="col-span-2 rounded-xl bg-primary/5 p-3.5 ring-1 ring-primary/10 sm:col-span-1">
             <p className="mb-1 font-medium text-[11px] text-zinc-500 tracking-wide">
               مبلغ نهایی
             </p>
@@ -132,7 +166,7 @@ export function InvoicePrintDocument({
           </div>
         </div>
 
-        <div className="mt-8 overflow-hidden rounded-xl border border-zinc-200">
+        <div className="mt-8 hidden overflow-hidden rounded-xl border border-zinc-200 md:block print:block">
           <Table>
             <TableHeader>
               <TableRow className="border-zinc-200 hover:bg-transparent">
@@ -192,6 +226,49 @@ export function InvoicePrintDocument({
               ))}
             </TableBody>
           </Table>
+        </div>
+
+        <div className="mt-8 space-y-3 md:hidden print:hidden">
+          {invoice.items.map((item, index) => (
+            <div key={item.id} className="rounded-xl border border-zinc-200">
+              <div className="flex items-center justify-between gap-2 border-zinc-100 border-b px-4 py-3">
+                <p className="font-bold text-sm text-zinc-900">{item.name}</p>
+                <span className="text-[11px] text-muted-foreground tabular-nums">
+                  ردیف {money(index + 1)}
+                </span>
+              </div>
+              <dl className="grid grid-cols-2 gap-x-4 gap-y-2 px-4 py-3 text-xs">
+                <div className="flex items-center justify-between gap-2">
+                  <dt className="text-muted-foreground">واحد</dt>
+                  <dd className="font-medium text-zinc-800">{item.unit}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <dt className="text-muted-foreground">تعداد</dt>
+                  <dd className="font-semibold text-zinc-900 tabular-nums">
+                    {money(item.quantity)}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <dt className="text-muted-foreground">قیمت واحد</dt>
+                  <dd className="font-semibold text-zinc-900 tabular-nums">
+                    {money(item.unitPrice)}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <dt className="text-muted-foreground">تخفیف</dt>
+                  <dd className="text-zinc-700 tabular-nums">
+                    {money(item.discount)}
+                  </dd>
+                </div>
+              </dl>
+              <div className="flex items-center justify-between gap-2 border-zinc-100 border-t border-dashed px-4 py-3">
+                <span className="text-muted-foreground text-xs">جمع</span>
+                <span className="font-bold text-zinc-900 tabular-nums">
+                  {money(lineNet(item.quantity, item.unitPrice, item.discount))}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
 
         <div className="mt-6 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">

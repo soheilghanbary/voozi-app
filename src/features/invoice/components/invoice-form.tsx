@@ -64,6 +64,14 @@ const convertToEnglishDigits = (str: string) => {
 const formatNumeric = (value: number) =>
   value ? value.toLocaleString('en-US', { maximumFractionDigits: 2 }) : ''
 
+const formatLive = (str: string) => {
+  const [intPart, fracPart] = str.split('.')
+  const grouped = intPart
+    ? Number.parseInt(intPart, 10).toLocaleString('en-US')
+    : ''
+  return fracPart === undefined ? grouped : `${grouped}.${fracPart}`
+}
+
 function NumericCell({
   value,
   onValueChange,
@@ -96,7 +104,7 @@ function NumericCell({
         const cleaned = english
           .replace(/[^0-9.]/g, '')
           .replace(/(\..*)\./g, '$1')
-        setText(cleaned)
+        setText(formatLive(cleaned))
         const num = cleaned === '' ? 0 : Number(cleaned)
         onValueChange(Number.isFinite(num) ? num : 0)
       }}
@@ -328,7 +336,6 @@ export function InvoiceForm({
               label={`تخفیف (${currencyLabel})`}
               value={field.value}
               onChange={field.onChange}
-              onBlur={field.onBlur}
               error={errors.discount?.message}
             />
           )}
@@ -341,7 +348,6 @@ export function InvoiceForm({
               label="درصد مالیات"
               value={field.value}
               onChange={field.onChange}
-              onBlur={field.onBlur}
               error={errors.taxRate?.message}
             />
           )}

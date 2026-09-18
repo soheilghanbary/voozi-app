@@ -54,10 +54,12 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground overflow-x-auto;
+    direction: rtl;
   }
   html {
     @apply font-sans;
+    direction: rtl;
   }
 }
 
