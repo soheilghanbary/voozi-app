@@ -39,13 +39,13 @@ export default async function Page({
   ])
 
   return (
-    <div className="space-y-4">
+    <div className="mx-auto w-full max-w-5xl space-y-4">
       <PageHeader
         backHref="/dashboard/invoices"
         backLabel="بازگشت به لیست فاکتورها"
         title="ویرایش فاکتور"
       />
-      <Card className="max-w-5xl">
+      <Card>
         <CardHeader>
           <CardTitle>ویرایش «فاکتور شماره {invoice.number}»</CardTitle>
           <CardDescription>
