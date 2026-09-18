@@ -15,20 +15,27 @@ const customerIdSchema = customerFormSchema.extend({
   id: z.string().min(1),
 })
 
+const toNullable = (value: string) => {
+  const trimmed = value.trim()
+  return trimmed === '' ? null : trimmed
+}
+
 export const createCustomer = authed
   .input(customerFormSchema)
   .output(z.object({ id: z.string().uuid() }))
   .handler(async ({ input, context }) => {
-    const [existing] = await db
-      .select({ id: customer.id })
-      .from(customer)
-      .where(eq(customer.nationalId, input.nationalId))
-      .limit(1)
+    if (input.nationalId) {
+      const [existing] = await db
+        .select({ id: customer.id })
+        .from(customer)
+        .where(eq(customer.nationalId, input.nationalId))
+        .limit(1)
 
-    if (existing) {
-      throw new ORPCError('CONFLICT', {
-        message: 'این شناسه ملی یا کد ملی قبلاً ثبت شده است.',
-      })
+      if (existing) {
+        throw new ORPCError('CONFLICT', {
+          message: 'این شناسه ملی یا کد ملی قبلاً ثبت شده است.',
+        })
+      }
     }
 
     const [created] = await db
@@ -39,9 +46,9 @@ export const createCustomer = authed
         name: input.name,
         customerType: input.customerType,
         mobile: input.mobile,
-        phone: input.phone,
-        address: input.address,
-        nationalId: input.nationalId,
+        phone: toNullable(input.phone),
+        address: toNullable(input.address),
+        nationalId: toNullable(input.nationalId),
       })
       .returning({ id: customer.id })
 
@@ -66,16 +73,18 @@ export const updateCustomer = authed
       })
     }
 
-    const [duplicate] = await db
-      .select({ id: customer.id })
-      .from(customer)
-      .where(
-        and(
-          eq(customer.nationalId, input.nationalId),
-          ne(customer.id, input.id)
-        )
-      )
-      .limit(1)
+    const duplicate = input.nationalId
+      ? await db
+          .select({ id: customer.id })
+          .from(customer)
+          .where(
+            and(
+              eq(customer.nationalId, input.nationalId),
+              ne(customer.id, input.id)
+            )
+          )
+          .limit(1)
+      : null
 
     if (duplicate) {
       throw new ORPCError('CONFLICT', {
@@ -89,9 +98,9 @@ export const updateCustomer = authed
         name: input.name,
         customerType: input.customerType,
         mobile: input.mobile,
-        phone: input.phone,
-        address: input.address,
-        nationalId: input.nationalId,
+        phone: toNullable(input.phone),
+        address: toNullable(input.address),
+        nationalId: toNullable(input.nationalId),
       })
       .where(
         and(eq(customer.id, input.id), eq(customer.userId, context.userId))

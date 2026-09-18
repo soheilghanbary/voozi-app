@@ -29,7 +29,7 @@ function mapCustomer(row: CustomerRow): Customer {
     mobile: row.mobile ?? '',
     phone: row.phone ?? '',
     address: row.address ?? '',
-    nationalId: row.nationalId,
+    nationalId: row.nationalId ?? '',
     createdAt: row.createdAt.toISOString(),
   }
 }

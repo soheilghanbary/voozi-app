@@ -12,12 +12,17 @@ export const customerFormSchema = z.object({
   phone: z
     .string()
     .trim()
-    .regex(/^0\d{2,3}\d{6,8}$/, 'تلفن معتبر نیست (مثال: 02188776655)'),
-  address: z.string().trim().min(5, 'آدرس را وارد کنید'),
+    .regex(/^0\d{2,3}\d{6,8}$/, 'تلفن معتبر نیست (مثال: 02188776655)')
+    .or(z.literal('')),
+  address: z
+    .string()
+    .trim()
+    .refine((value) => value === '' || value.length >= 5, 'آدرس را وارد کنید'),
   nationalId: z
     .string()
     .trim()
-    .regex(/^\d{10}$|^\d{11}$/, 'شناسه ملی یا کد ملی نامعتبر است'),
+    .regex(/^\d{10}$|^\d{11}$/, 'شناسه ملی یا کد ملی نامعتبر است')
+    .or(z.literal('')),
 })
 
 export type CustomerFormValues = z.infer<typeof customerFormSchema>

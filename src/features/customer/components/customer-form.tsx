@@ -127,7 +127,9 @@ export function CustomerForm({ customer }: { customer?: Customer }) {
           </FieldContent>
         </Field>
         <Field>
-          <FieldLabel>تلفن</FieldLabel>
+          <FieldLabel>
+            تلفن <span className="text-muted-foreground">(اختیاری)</span>
+          </FieldLabel>
           <FieldContent>
             <Input
               dir="ltr"
@@ -140,7 +142,10 @@ export function CustomerForm({ customer }: { customer?: Customer }) {
           </FieldContent>
         </Field>
         <Field>
-          <FieldLabel>شناسه ملی یا کد ملی</FieldLabel>
+          <FieldLabel>
+            شناسه ملی یا کد ملی{' '}
+            <span className="text-muted-foreground">(اختیاری)</span>
+          </FieldLabel>
           <FieldContent>
             <Input
               dir="ltr"
@@ -154,7 +159,9 @@ export function CustomerForm({ customer }: { customer?: Customer }) {
         </Field>
       </div>
       <Field>
-        <FieldLabel>آدرس</FieldLabel>
+        <FieldLabel>
+          آدرس <span className="text-muted-foreground">(اختیاری)</span>
+        </FieldLabel>
         <FieldContent>
           <Textarea
             placeholder="تهران، خیابان ولیعصر، کوچه بهار، پلاک ۱۲"
