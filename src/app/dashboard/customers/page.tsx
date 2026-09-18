@@ -1,10 +1,11 @@
-import { call } from '@orpc/server'
+import { cacheTag } from 'next/cache'
 import { Suspense } from 'react'
 import { DataTableSkeleton } from '@/components/data-table-skeleton'
 import { PageHeader } from '@/components/page-header'
-import { listCustomers } from '@/features/customer/api/queries'
+import { getCustomersByUserId } from '@/features/customer/api/queries'
 import { columns } from '@/features/customer/components/columns'
 import { DataTable } from '@/features/customer/components/data-table'
+import { getSession } from '@/server/lib/session'
 
 export default function Page() {
   return (
@@ -18,6 +19,18 @@ export default function Page() {
 }
 
 async function CustomersTable() {
-  const customers = await call(listCustomers)
+  const session = await getSession()
+  const userId = session?.session.userId ?? ''
+
+  return <CachedCustomersTable userId={userId} />
+}
+
+async function CachedCustomersTable({ userId }: { userId: string }) {
+  'use cache'
+
+  cacheTag(`customers:${userId}`)
+
+  const customers = await getCustomersByUserId(userId)
+
   return <DataTable columns={columns} data={customers} />
 }

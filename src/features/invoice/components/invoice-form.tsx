@@ -415,19 +415,9 @@ export function InvoiceForm({
                     <ComboboxList>
                       {(customer: Customer) => (
                         <ComboboxItem key={customer.id} value={customer}>
-                          <div className="flex min-w-0 flex-col">
-                            <span className="truncate font-medium">
-                              {customer.name}
-                            </span>
-                            {(customer.mobile || customer.phone) && (
-                              <span
-                                className="text-muted-foreground text-xs"
-                                dir="ltr"
-                              >
-                                {customer.mobile || customer.phone}
-                              </span>
-                            )}
-                          </div>
+                          <span className="truncate font-medium">
+                            {customer.name}
+                          </span>
                         </ComboboxItem>
                       )}
                     </ComboboxList>

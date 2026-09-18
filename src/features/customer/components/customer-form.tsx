@@ -2,7 +2,6 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ORPCError } from '@orpc/client'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -44,7 +43,15 @@ function toFormValues(customer: Customer): CustomerFormValues {
   }
 }
 
-export function CustomerForm({ customer }: { customer?: Customer }) {
+export function CustomerForm({
+  customer,
+  onSaved,
+  onCancelled,
+}: {
+  customer?: Customer
+  onSaved?: () => void
+  onCancelled?: () => void
+}) {
   const router = useRouter()
   const {
     register,
@@ -65,8 +72,8 @@ export function CustomerForm({ customer }: { customer?: Customer }) {
         await api.customers.create(values)
         toast.success('مشتری جدید با موفقیت افزوده شد.')
       }
-      router.push('/dashboard/customers')
       router.refresh()
+      onSaved?.()
     } catch (error) {
       if (error instanceof ORPCError && error.code === 'CONFLICT') {
         toast.error('این شناسه ملی یا کد ملی قبلاً ثبت شده است.')
@@ -181,14 +188,16 @@ export function CustomerForm({ customer }: { customer?: Customer }) {
               ? 'ثبت تغییرات'
               : 'ثبت مشتری'}
         </Button>
-        <Button
-          variant="outline"
-          nativeButton={false}
-          disabled={isSubmitting}
-          render={<Link href="/dashboard/customers" />}
-        >
-          انصراف
-        </Button>
+        {onCancelled && (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isSubmitting}
+            onClick={onCancelled}
+          >
+            انصراف
+          </Button>
+        )}
       </div>
     </form>
   )

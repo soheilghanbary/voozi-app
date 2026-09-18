@@ -334,7 +334,7 @@ function QuickActionsSection() {
     {
       label: 'افزودن مشتری',
       desc: 'ثبت مشتری جدید',
-      href: '/dashboard/customers/new',
+      href: '/dashboard/customers',
       icon: <Users className="size-4.5" />,
     },
   ]

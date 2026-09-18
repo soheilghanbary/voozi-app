@@ -3,6 +3,7 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 import { ORPCError } from '@orpc/server'
 import { and, eq, ne } from 'drizzle-orm'
+import { revalidateTag } from 'next/cache'
 import { z } from 'zod'
 import { customerFormSchema } from '@/features/customer/utils/customer-schema'
 import { db } from '@/server/db'
@@ -18,6 +19,10 @@ const customerIdSchema = customerFormSchema.extend({
 const toNullable = (value: string) => {
   const trimmed = value.trim()
   return trimmed === '' ? null : trimmed
+}
+
+const revalidateCustomers = (userId: string) => {
+  revalidateTag(`customers:${userId}`, { expire: 0 })
 }
 
 export const createCustomer = authed
@@ -51,6 +56,8 @@ export const createCustomer = authed
         nationalId: toNullable(input.nationalId),
       })
       .returning({ id: customer.id })
+
+    revalidateCustomers(context.userId)
 
     return { id: created.id }
   })
@@ -107,6 +114,8 @@ export const updateCustomer = authed
       )
       .returning({ id: customer.id })
 
+    revalidateCustomers(context.userId)
+
     return { id: updated.id }
   })
 
@@ -126,6 +135,8 @@ export const deleteCustomer = authed
         message: 'مشتری یافت نشد.',
       })
     }
+
+    revalidateCustomers(context.userId)
 
     return { id: deleted.id }
   })

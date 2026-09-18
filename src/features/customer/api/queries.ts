@@ -34,18 +34,22 @@ function mapCustomer(row: CustomerRow): Customer {
   }
 }
 
+export const getCustomersByUserId = async (
+  userId: string
+): Promise<Customer[]> => {
+  const rows = await db
+    .select()
+    .from(customer)
+    .where(eq(customer.userId, userId))
+    .orderBy(desc(customer.createdAt))
+
+  return rows.map(mapCustomer)
+}
+
 export const listCustomers = authed
   .input(z.void())
   .output(z.array(customerOutput))
-  .handler(async ({ context }) => {
-    const rows = await db
-      .select()
-      .from(customer)
-      .where(eq(customer.userId, context.userId))
-      .orderBy(desc(customer.createdAt))
-
-    return rows.map(mapCustomer)
-  })
+  .handler(async ({ context }) => getCustomersByUserId(context.userId))
 
 export const getCustomer = authed
   .input(z.object({ id: z.string().min(1) }))
