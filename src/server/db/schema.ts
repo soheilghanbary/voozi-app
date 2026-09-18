@@ -8,6 +8,7 @@ import {
   timestamp,
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
+import { NOTE_COLORS } from '@/features/note/utils/note-colors'
 
 export const user = pgTable('user', {
   id: text('id').primaryKey(),
@@ -131,6 +132,29 @@ export const product = pgTable(
       .notNull(),
   },
   (table) => [index('product_userId_idx').on(table.userId)]
+)
+
+export const note = pgTable(
+  'note',
+  {
+    id: text('id').primaryKey(),
+    userId: text('user_id').references(() => user.id, {
+      onDelete: 'cascade',
+    }),
+    title: text('title').notNull(),
+    content: text('content'),
+    color: text('color', {
+      enum: [...NOTE_COLORS],
+    })
+      .default('teal')
+      .notNull(),
+    createdAt: timestamp('created_at').defaultNow().notNull(),
+    updatedAt: timestamp('updated_at')
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
+  },
+  (table) => [index('note_userId_idx').on(table.userId)]
 )
 
 export const invoice = pgTable(

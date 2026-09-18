@@ -34,3 +34,7 @@ yarn-error.log*
 next-env.d.ts
 
 /generated
+
+# ai agents
+.opencode
+.agents

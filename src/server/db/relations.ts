@@ -5,6 +5,7 @@ import {
   customer,
   invoice,
   invoiceItem,
+  note,
   product,
   session,
   user,
@@ -17,6 +18,7 @@ export const relations = defineRelations(
     account,
     customer,
     product,
+    note,
     invoice,
     invoiceItem,
     businessProfile,
@@ -27,6 +29,7 @@ export const relations = defineRelations(
       accounts: r.many.account(),
       customers: r.many.customer(),
       products: r.many.product(),
+      notes: r.many.note(),
       invoices: r.many.invoice(),
       businessProfile: r.one.businessProfile({
         from: r.user.id,
@@ -58,6 +61,12 @@ export const relations = defineRelations(
         to: r.user.id,
       }),
       invoiceItems: r.many.invoiceItem(),
+    },
+    note: {
+      user: r.one.user({
+        from: r.note.userId,
+        to: r.user.id,
+      }),
     },
     invoice: {
       user: r.one.user({
