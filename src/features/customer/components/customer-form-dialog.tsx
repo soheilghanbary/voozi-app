@@ -39,7 +39,7 @@ export function CustomerFormDialog({
       onOpenChange={handleOpenChange}
     >
       {trigger && <DialogTrigger render={trigger} />}
-      <DialogContent className="max-h-[calc(100dvh-4rem)] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[calc(100dvh-4rem)] overflow-y-auto sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{customer ? 'ویرایش مشتری' : 'مشتری جدید'}</DialogTitle>
           <DialogDescription>

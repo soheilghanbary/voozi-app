@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { SelectField } from '@/components/ui/select-field'
+import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { api } from '@/server/orpc/client'
 import {
@@ -116,13 +117,9 @@ export function ProductForm({
             </FieldContent>
           </Field>
           <Field className="col-span-2">
-            <FieldLabel>نام محصول</FieldLabel>
+            <FieldLabel>نام</FieldLabel>
             <FieldContent>
-              <Input
-                aria-invalid={!!errors.name}
-                placeholder="مثلاً: استیل ضد زنگ ۳۰۴"
-                {...register('name')}
-              />
+              <Input aria-invalid={!!errors.name} {...register('name')} />
               <FieldError>{errors.name?.message}</FieldError>
             </FieldContent>
           </Field>
@@ -150,7 +147,7 @@ export function ProductForm({
             name="basePrice"
             render={({ field }) => (
               <AmountField
-                label="قیمت پایه (تومان)"
+                label="قیمت پایه"
                 value={field.value}
                 onChange={field.onChange}
                 error={errors.basePrice?.message}
@@ -161,13 +158,8 @@ export function ProductForm({
       </fieldset>
       <div className="flex items-center gap-2 pt-2">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? product
-              ? 'در حال ثبت تغییرات…'
-              : 'در حال ثبت…'
-            : product
-              ? 'ثبت تغییرات'
-              : 'ثبت محصول'}
+          {isSubmitting && <Spinner />}
+          ذخیره
         </Button>
         {onCancelled && (
           <Button

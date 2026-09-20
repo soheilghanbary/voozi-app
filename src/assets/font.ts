@@ -1,7 +1,7 @@
 import localFont from 'next/font/local'
 
 export const font = localFont({
-  src: './fonts/IRANSansXVF.woff2',
+  src: './fonts/IRANYekanXVF.woff2',
   weight: '300 900',
   style: 'normal',
   display: 'swap',
