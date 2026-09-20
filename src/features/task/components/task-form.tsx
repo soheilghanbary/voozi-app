@@ -10,6 +10,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import type { Task } from '../types'
@@ -17,6 +18,7 @@ import {
   PRIORITIES,
   PRIORITY_LABELS,
   PRIORITY_STYLES,
+  type TaskPriority,
 } from '../utils/task-priority'
 import { type TaskFormValues, taskFormSchema } from '../utils/task-schema'
 
@@ -93,37 +95,41 @@ export function TaskForm({
       <Field>
         <FieldLabel>اولویت</FieldLabel>
         <FieldContent>
-          <div className="flex w-fit items-center gap-1 rounded-xl bg-muted p-1">
-            {PRIORITIES.map((option) => {
-              const selected = priority === option
-              return (
-                <button
-                  key={option}
-                  type="button"
-                  aria-pressed={selected}
-                  onClick={() =>
-                    setValue('priority', option, { shouldValidate: true })
-                  }
-                  className={cn(
-                    'flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium text-sm',
-                    'transition-all duration-150 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                    selected
-                      ? cn('bg-card shadow-sm', PRIORITY_STYLES[option].badge)
-                      : 'text-muted-foreground hover:text-foreground'
-                  )}
-                >
-                  <span
-                    aria-hidden
+          <Tabs
+            value={priority}
+            onValueChange={(value) =>
+              setValue('priority', value as TaskPriority, {
+                shouldValidate: true,
+              })
+            }
+          >
+            <TabsList className="gap-1 rounded-xl! border-0! bg-muted! p-1!">
+              {PRIORITIES.map((option) => {
+                const selected = priority === option
+                return (
+                  <TabsTrigger
+                    key={option}
+                    value={option}
                     className={cn(
-                      'size-1.5 rounded-full',
-                      PRIORITY_STYLES[option].dot
+                      'flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-medium text-sm transition-all duration-150',
+                      selected
+                        ? 'bg-card shadow-sm data-active:bg-card! data-active:text-foreground!'
+                        : 'text-foreground/60 hover:text-foreground'
                     )}
-                  />
-                  {PRIORITY_LABELS[option]}
-                </button>
-              )
-            })}
-          </div>
+                  >
+                    <span
+                      aria-hidden
+                      className={cn(
+                        'size-1.5 rounded-full',
+                        PRIORITY_STYLES[option].dot
+                      )}
+                    />
+                    {PRIORITY_LABELS[option]}
+                  </TabsTrigger>
+                )
+              })}
+            </TabsList>
+          </Tabs>
         </FieldContent>
       </Field>
       <div className="flex items-center gap-2 pt-2">

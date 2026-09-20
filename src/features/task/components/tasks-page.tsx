@@ -6,6 +6,7 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { cn } from '@/lib/utils'
 import { api } from '@/server/orpc/client'
 import type { Task } from '../types'
@@ -18,7 +19,7 @@ type TaskFilter = 'all' | 'open' | 'done'
 const FILTERS: { key: TaskFilter; label: string }[] = [
   { key: 'all', label: 'همه' },
   { key: 'open', label: 'باز' },
-  { key: 'done', label: 'تکمیل‌شده' },
+  { key: 'done', label: 'تکمیل' },
 ]
 
 function sortTasks(tasks: Task[]): Task[] {
@@ -157,7 +158,8 @@ export function TasksPageClient({ tasks: initialTasks }: { tasks: Task[] }) {
 
   return (
     <div className="space-y-4">
-      <PageHeader title="وظایف">
+      <PageHeader title="وظایف" />
+      <div className="flex items-center justify-between gap-2">
         <TaskFormDialog
           onSubmit={handleCreate}
           trigger={
@@ -167,39 +169,40 @@ export function TasksPageClient({ tasks: initialTasks }: { tasks: Task[] }) {
             </Button>
           }
         />
-      </PageHeader>
-
-      <div className="flex w-fit items-center gap-1 rounded-xl bg-muted p-1">
-        {FILTERS.map(({ key, label }) => {
-          const selected = filter === key
-          return (
-            <button
-              key={key}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => setFilter(key)}
-              className={cn(
-                'flex items-center gap-2 rounded-lg px-3.5 py-1.5 font-medium text-sm',
-                'transition-all duration-150 focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
-                selected
-                  ? 'bg-card shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-              )}
-            >
-              {label}
-              <span
-                className={cn(
-                  'rounded-full px-1.5 py-0.5 text-[11px] tabular-nums leading-none',
-                  selected
-                    ? 'bg-muted'
-                    : 'bg-background/70 text-muted-foreground'
-                )}
-              >
-                {counts[key]}
-              </span>
-            </button>
-          )
-        })}
+        <Tabs
+          value={filter}
+          onValueChange={(value) => setFilter(value as TaskFilter)}
+        >
+          <TabsList className="gap-1 rounded-xl! border-0! bg-muted! p-1!">
+            {FILTERS.map(({ key, label }) => {
+              const selected = filter === key
+              return (
+                <TabsTrigger
+                  key={key}
+                  value={key}
+                  className={cn(
+                    'flex items-center gap-2 rounded-lg px-3.5 py-1.5 font-medium text-sm transition-all duration-150',
+                    selected
+                      ? 'bg-card shadow-sm data-active:bg-card! data-active:text-foreground!'
+                      : 'text-foreground/60 hover:text-foreground'
+                  )}
+                >
+                  {label}
+                  <span
+                    className={cn(
+                      'rounded-full px-1.5 py-0.5 text-[11px] tabular-nums leading-none',
+                      selected
+                        ? 'bg-muted'
+                        : 'bg-background/70 text-muted-foreground'
+                    )}
+                  >
+                    {counts[key]}
+                  </span>
+                </TabsTrigger>
+              )
+            })}
+          </TabsList>
+        </Tabs>
       </div>
 
       {tasks.length > 0 && visibleTasks.length === 0 ? (

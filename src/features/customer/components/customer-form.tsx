@@ -107,11 +107,7 @@ export function CustomerForm({
           <Field className="col-span-2">
             <FieldLabel>نام مشتری / شرکت</FieldLabel>
             <FieldContent>
-              <Input
-                aria-invalid={!!errors.name}
-                placeholder="مثلاً: علی رضایی"
-                {...register('name')}
-              />
+              <Input aria-invalid={!!errors.name} {...register('name')} />
               <FieldError>{errors.name?.message}</FieldError>
             </FieldContent>
           </Field>
@@ -121,7 +117,6 @@ export function CustomerForm({
               <Input
                 dir="ltr"
                 inputMode="numeric"
-                placeholder="09123456789"
                 aria-invalid={!!errors.mobile}
                 {...register('mobile')}
               />
@@ -136,7 +131,6 @@ export function CustomerForm({
               <Input
                 dir="ltr"
                 inputMode="numeric"
-                placeholder="02188776655"
                 aria-invalid={!!errors.phone}
                 {...register('phone')}
               />
@@ -150,7 +144,6 @@ export function CustomerForm({
           </FieldLabel>
           <FieldContent>
             <Textarea
-              placeholder="تهران، خیابان ولیعصر، کوچه بهار، پلاک ۱۲"
               aria-invalid={!!errors.address}
               {...register('address')}
             />

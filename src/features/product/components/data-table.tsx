@@ -45,13 +45,7 @@ export function DataTable<TData extends RowData>({
           />
         </div>
         <div className="ms-auto flex items-center gap-2">
-          <ProductFormDialog
-            trigger={
-              <Button size="sm" className="h-7">
-                محصول جدید
-              </Button>
-            }
-          />
+          <ProductFormDialog trigger={<Button>محصول جدید</Button>} />
           <DataTableViewOptions table={table} />
         </div>
       </div>
