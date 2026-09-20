@@ -72,16 +72,6 @@ export const columns = columnHelper.columns([
       )
     },
   }),
-  columnHelper.accessor('description', {
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="توضیحات" />
-    ),
-    cell: ({ row }) => (
-      <div className="max-w-56 truncate text-muted-foreground">
-        {row.getValue<string>('description') || '—'}
-      </div>
-    ),
-  }),
   columnHelper.accessor('createdAt', {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="تاریخ ثبت" />

@@ -19,10 +19,7 @@ const filterFn_productSearch = constructFilterFn({
       .trim()
       .toLowerCase()
     const product = row.original as Product
-    return (
-      product.name.toLowerCase().includes(value) ||
-      product.description.toLowerCase().includes(value)
-    )
+    return product.name.toLowerCase().includes(value)
   },
   autoRemove: (filterValue) => !String(filterValue ?? '').trim(),
 })

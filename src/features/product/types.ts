@@ -27,7 +27,6 @@ export type Product = {
   productType: ProductType
   unit: ProductUnit
   basePrice: number
-  description: string
   isActive: boolean
   createdAt: string
 }
@@ -37,7 +36,6 @@ export const PRODUCT_COLUMN_LABELS: Record<string, string> = {
   productType: 'خدمات یا محصول',
   unit: 'واحد اندازه‌گیری',
   basePrice: 'قیمت پایه',
-  description: 'توضیحات',
   isActive: 'وضعیت',
   createdAt: 'تاریخ ثبت',
 }

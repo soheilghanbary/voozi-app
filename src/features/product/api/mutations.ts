@@ -28,7 +28,6 @@ export const createProduct = authed
         productType: input.productType,
         unit: input.unit,
         basePrice: input.basePrice,
-        description: input.description,
       })
       .returning({ id: product.id })
 
@@ -58,7 +57,6 @@ export const updateProduct = authed
         productType: input.productType,
         unit: input.unit,
         basePrice: input.basePrice,
-        description: input.description,
       })
       .where(and(eq(product.id, input.id), eq(product.userId, context.userId)))
       .returning({ id: product.id })

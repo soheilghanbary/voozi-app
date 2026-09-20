@@ -26,11 +26,6 @@ export const productFormSchema = z.object({
   basePrice: z
     .number({ message: 'قیمت پایه را به صورت عدد وارد کنید' })
     .min(0, 'قیمت پایه نمی‌تواند منفی باشد'),
-  description: z
-    .string()
-    .trim()
-    .max(500, 'توضیحات حداکثر ۵۰۰ حرف باشد')
-    .optional(),
 })
 
 export type ProductFormValues = z.infer<typeof productFormSchema>

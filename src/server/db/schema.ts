@@ -123,7 +123,6 @@ export const product = pgTable(
       .notNull(),
     unit: text('unit').notNull(),
     basePrice: integer('base_price').default(0).notNull(),
-    description: text('description'),
     isActive: boolean('is_active').default(true).notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')

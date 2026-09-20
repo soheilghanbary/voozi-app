@@ -29,7 +29,6 @@ const productOutput = z.object({
   productType: z.enum(productTypeKeys),
   unit: z.enum(productUnitKeys),
   basePrice: z.number(),
-  description: z.string(),
   isActive: z.boolean(),
   createdAt: z.string(),
 })
@@ -43,7 +42,6 @@ function mapProduct(row: ProductRow): Product {
     productType: row.productType,
     unit: row.unit as ProductUnit,
     basePrice: row.basePrice,
-    description: row.description ?? '',
     isActive: row.isActive,
     createdAt: row.createdAt.toISOString(),
   }

@@ -34,7 +34,6 @@ const emptyForm: ProductFormValues = {
   productType: 'product',
   unit: 'item',
   basePrice: 0,
-  description: '',
 }
 
 function toFormValues(product: Product): ProductFormValues {
@@ -43,7 +42,6 @@ function toFormValues(product: Product): ProductFormValues {
     productType: product.productType,
     unit: product.unit,
     basePrice: product.basePrice,
-    description: product.description,
   }
 }
 
