@@ -99,7 +99,6 @@ export const customer = pgTable(
     mobile: text('mobile'),
     phone: text('phone'),
     address: text('address'),
-    nationalId: text('national_id').unique(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')
       .defaultNow()

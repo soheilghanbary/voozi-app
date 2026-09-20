@@ -1,5 +1,4 @@
 'use client'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ORPCError } from '@orpc/client'
 import { useRouter } from 'next/navigation'
@@ -14,14 +13,8 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Textarea } from '@/components/ui/textarea'
+import { SelectField } from '@/components/ui/select-field'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { api } from '@/server/orpc/client'
 import {
   PRODUCT_TYPE,
@@ -97,109 +90,75 @@ export function ProductForm({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field>
-          <FieldLabel>نام</FieldLabel>
-          <FieldContent>
-            <Input
-              aria-invalid={!!errors.name}
-              placeholder="مثلاً: استیل ضد زنگ ۳۰۴"
-              {...register('name')}
-            />
-            <FieldError>{errors.name?.message}</FieldError>
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel>خدمات یا محصول</FieldLabel>
-          <FieldContent>
-            <Controller
-              control={control}
-              name="productType"
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue>
-                      {(value) =>
-                        value
-                          ? (PRODUCT_TYPE[value as ProductType]?.label ?? 'نوع')
-                          : 'نوع'
-                      }
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(Object.keys(PRODUCT_TYPE) as ProductType[]).map(
-                      (productType) => (
-                        <SelectItem key={productType} value={productType}>
-                          {PRODUCT_TYPE[productType].label}
-                        </SelectItem>
-                      )
-                    )}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FieldError>{errors.productType?.message}</FieldError>
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel>واحد اندازه‌گیری</FieldLabel>
-          <FieldContent>
-            <Controller
-              control={control}
-              name="unit"
-              render={({ field }) => (
-                <Select value={field.value} onValueChange={field.onChange}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue>
-                      {(value) =>
-                        value
-                          ? (PRODUCT_UNITS[value as ProductUnit]?.label ??
-                            'واحد')
-                          : 'واحد'
-                      }
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {(Object.keys(PRODUCT_UNITS) as ProductUnit[]).map(
-                      (unit) => (
-                        <SelectItem key={unit} value={unit}>
-                          {PRODUCT_UNITS[unit].label}
-                        </SelectItem>
-                      )
-                    )}
-                  </SelectContent>
-                </Select>
-              )}
-            />
-            <FieldError>{errors.unit?.message}</FieldError>
-          </FieldContent>
-        </Field>
-        <Controller
-          control={control}
-          name="basePrice"
-          render={({ field }) => (
-            <AmountField
-              label="قیمت پایه (تومان)"
-              value={field.value}
-              onChange={field.onChange}
-              error={errors.basePrice?.message}
-            />
-          )}
-        />
-      </div>
-      <Field>
-        <FieldLabel>
-          توضیحات <span className="text-muted-foreground">(اختیاری)</span>
-        </FieldLabel>
-        <FieldContent>
-          <Textarea
-            placeholder="توضیحات تکمیلی محصول..."
-            aria-invalid={!!errors.description}
-            {...register('description')}
+      <fieldset disabled={isSubmitting} className="space-y-5">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field className="col-span-2 flex-row">
+            <FieldLabel>نوع محصول</FieldLabel>
+            <FieldContent>
+              <Controller
+                control={control}
+                name="productType"
+                render={({ field }) => (
+                  <Tabs value={field.value} onValueChange={field.onChange}>
+                    <TabsList>
+                      {(Object.keys(PRODUCT_TYPE) as ProductType[]).map(
+                        (productType) => (
+                          <TabsTrigger key={productType} value={productType}>
+                            {PRODUCT_TYPE[productType].label}
+                          </TabsTrigger>
+                        )
+                      )}
+                    </TabsList>
+                  </Tabs>
+                )}
+              />
+              <FieldError>{errors.productType?.message}</FieldError>
+            </FieldContent>
+          </Field>
+          <Field className="col-span-2">
+            <FieldLabel>نام محصول</FieldLabel>
+            <FieldContent>
+              <Input
+                aria-invalid={!!errors.name}
+                placeholder="مثلاً: استیل ضد زنگ ۳۰۴"
+                {...register('name')}
+              />
+              <FieldError>{errors.name?.message}</FieldError>
+            </FieldContent>
+          </Field>
+          <Controller
+            control={control}
+            name="unit"
+            render={({ field }) => (
+              <SelectField
+                label="واحد اندازه‌گیری"
+                value={field.value}
+                onChange={field.onChange}
+                options={(Object.keys(PRODUCT_UNITS) as ProductUnit[]).map(
+                  (unit) => ({
+                    value: unit,
+                    label: PRODUCT_UNITS[unit].label,
+                  })
+                )}
+                placeholder="واحد"
+                error={errors.unit?.message}
+              />
+            )}
           />
-          <FieldError>{errors.description?.message}</FieldError>
-        </FieldContent>
-      </Field>
+          <Controller
+            control={control}
+            name="basePrice"
+            render={({ field }) => (
+              <AmountField
+                label="قیمت پایه (تومان)"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.basePrice?.message}
+              />
+            )}
+          />
+        </div>
+      </fieldset>
       <div className="flex items-center gap-2 pt-2">
         <Button type="submit" disabled={isSubmitting}>
           {isSubmitting

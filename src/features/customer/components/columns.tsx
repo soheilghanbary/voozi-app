@@ -66,16 +66,6 @@ export const columns = columnHelper.columns([
       </div>
     ),
   }),
-  columnHelper.accessor('nationalId', {
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="شناسه ملی یا کد ملی" />
-    ),
-    cell: ({ row }) => (
-      <div className="whitespace-nowrap tabular-nums" dir="ltr">
-        {row.getValue<string>('nationalId')}
-      </div>
-    ),
-  }),
   columnHelper.accessor('createdAt', {
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="تاریخ عضویت" />

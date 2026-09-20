@@ -16,7 +16,7 @@ type TextFieldProps = InputHTMLAttributes<HTMLInputElement> & {
 }
 
 export const TextField = forwardRef(function MyInput(
-  { label, description, error, inputClass, className, ...rest }: TextFieldProps,
+  { label, description, error, className, inputClass, ...rest }: TextFieldProps,
   ref: ForwardedRef<HTMLInputElement>
 ) {
   const id = useId()
@@ -25,9 +25,9 @@ export const TextField = forwardRef(function MyInput(
       <Label htmlFor={id}>{label}</Label>
       <Input
         id={id}
+        ref={ref}
         type="text"
         autoComplete="off"
-        ref={ref}
         className={inputClass}
         {...rest}
       />
@@ -35,7 +35,9 @@ export const TextField = forwardRef(function MyInput(
         <span className="text-muted-foreground text-xs">{description}</span>
       )}
       {error && (
-        <span className="font-medium text-destructive text-xs">{error}</span>
+        <span className="-mt-1 font-medium text-destructive text-xs">
+          {error}
+        </span>
       )}
     </div>
   )

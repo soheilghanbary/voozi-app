@@ -15,7 +15,6 @@ const customerOutput = z.object({
   mobile: z.string(),
   phone: z.string(),
   address: z.string(),
-  nationalId: z.string(),
   createdAt: z.string(),
 })
 
@@ -29,7 +28,6 @@ function mapCustomer(row: CustomerRow): Customer {
     mobile: row.mobile ?? '',
     phone: row.phone ?? '',
     address: row.address ?? '',
-    nationalId: row.nationalId ?? '',
     createdAt: row.createdAt.toISOString(),
   }
 }

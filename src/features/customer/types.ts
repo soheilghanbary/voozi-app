@@ -12,13 +12,11 @@ export type Customer = {
   mobile: string
   phone: string
   address: string
-  nationalId: string
   createdAt: string
 }
 
 export const CUSTOMER_COLUMN_LABELS: Record<string, string> = {
   name: 'نام',
-  nationalId: 'شناسه ملی',
   customerType: 'حقیقی یا حقوقی',
   mobile: 'شماره تماس',
   phone: 'تلفن',

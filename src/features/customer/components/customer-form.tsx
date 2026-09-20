@@ -1,7 +1,6 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ORPCError } from '@orpc/client'
 import { useRouter } from 'next/navigation'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -13,6 +12,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/server/orpc/client'
@@ -29,7 +29,6 @@ const emptyForm: CustomerFormValues = {
   mobile: '',
   phone: '',
   address: '',
-  nationalId: '',
 }
 
 function toFormValues(customer: Customer): CustomerFormValues {
@@ -39,7 +38,6 @@ function toFormValues(customer: Customer): CustomerFormValues {
     mobile: customer.mobile,
     phone: customer.phone,
     address: customer.address,
-    nationalId: customer.nationalId,
   }
 }
 
@@ -74,119 +72,96 @@ export function CustomerForm({
       }
       router.refresh()
       onSaved?.()
-    } catch (error) {
-      if (error instanceof ORPCError && error.code === 'CONFLICT') {
-        toast.error('این شناسه ملی یا کد ملی قبلاً ثبت شده است.')
-      } else {
-        toast.error('ثبت مشتری ناموفق بود. دوباره تلاش کنید.')
-      }
+    } catch {
+      toast.error('ثبت مشتری ناموفق بود. دوباره تلاش کنید.')
     }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-      <div className="grid gap-5 sm:grid-cols-2">
-        <Field>
-          <FieldLabel>نام مشتری</FieldLabel>
-          <FieldContent>
-            <Input
-              aria-invalid={!!errors.name}
-              placeholder="مثلاً: علی رضایی"
-              {...register('name')}
-            />
-            <FieldError>{errors.name?.message}</FieldError>
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel>نوع مشتری</FieldLabel>
-          <FieldContent>
-            <Controller
-              control={control}
-              name="customerType"
-              render={({ field }) => (
-                <Tabs value={field.value} onValueChange={field.onChange}>
-                  <TabsList>
-                    {(Object.keys(CUSTOMER_TYPE) as CustomerType[]).map(
-                      (customerType) => (
-                        <TabsTrigger key={customerType} value={customerType}>
-                          {CUSTOMER_TYPE[customerType].label}
-                        </TabsTrigger>
-                      )
-                    )}
-                  </TabsList>
-                </Tabs>
-              )}
-            />
-            <FieldError>{errors.customerType?.message}</FieldError>
-          </FieldContent>
-        </Field>
-        <Field>
-          <FieldLabel>شماره تماس</FieldLabel>
-          <FieldContent>
-            <Input
-              dir="ltr"
-              inputMode="numeric"
-              placeholder="09123456789"
-              aria-invalid={!!errors.mobile}
-              {...register('mobile')}
-            />
-            <FieldError>{errors.mobile?.message}</FieldError>
-          </FieldContent>
-        </Field>
+      <fieldset disabled={isSubmitting} className="space-y-5">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Field className="col-span-2 flex-row">
+            <FieldLabel>نوع مشتری</FieldLabel>
+            <FieldContent>
+              <Controller
+                control={control}
+                name="customerType"
+                render={({ field }) => (
+                  <Tabs value={field.value} onValueChange={field.onChange}>
+                    <TabsList>
+                      {(Object.keys(CUSTOMER_TYPE) as CustomerType[]).map(
+                        (customerType) => (
+                          <TabsTrigger key={customerType} value={customerType}>
+                            {CUSTOMER_TYPE[customerType].label}
+                          </TabsTrigger>
+                        )
+                      )}
+                    </TabsList>
+                  </Tabs>
+                )}
+              />
+              <FieldError>{errors.customerType?.message}</FieldError>
+            </FieldContent>
+          </Field>
+          <Field className="col-span-2">
+            <FieldLabel>نام مشتری / شرکت</FieldLabel>
+            <FieldContent>
+              <Input
+                aria-invalid={!!errors.name}
+                placeholder="مثلاً: علی رضایی"
+                {...register('name')}
+              />
+              <FieldError>{errors.name?.message}</FieldError>
+            </FieldContent>
+          </Field>
+          <Field>
+            <FieldLabel>شماره تماس</FieldLabel>
+            <FieldContent>
+              <Input
+                dir="ltr"
+                inputMode="numeric"
+                placeholder="09123456789"
+                aria-invalid={!!errors.mobile}
+                {...register('mobile')}
+              />
+              <FieldError>{errors.mobile?.message}</FieldError>
+            </FieldContent>
+          </Field>
+          <Field>
+            <FieldLabel>
+              تلفن <span className="text-muted-foreground">(اختیاری)</span>
+            </FieldLabel>
+            <FieldContent>
+              <Input
+                dir="ltr"
+                inputMode="numeric"
+                placeholder="02188776655"
+                aria-invalid={!!errors.phone}
+                {...register('phone')}
+              />
+              <FieldError>{errors.phone?.message}</FieldError>
+            </FieldContent>
+          </Field>
+        </div>
         <Field>
           <FieldLabel>
-            تلفن <span className="text-muted-foreground">(اختیاری)</span>
+            آدرس <span className="text-muted-foreground">(اختیاری)</span>
           </FieldLabel>
           <FieldContent>
-            <Input
-              dir="ltr"
-              inputMode="numeric"
-              placeholder="02188776655"
-              aria-invalid={!!errors.phone}
-              {...register('phone')}
+            <Textarea
+              placeholder="تهران، خیابان ولیعصر، کوچه بهار، پلاک ۱۲"
+              aria-invalid={!!errors.address}
+              {...register('address')}
             />
-            <FieldError>{errors.phone?.message}</FieldError>
+            <FieldError>{errors.address?.message}</FieldError>
           </FieldContent>
         </Field>
-        <Field>
-          <FieldLabel>
-            شناسه ملی یا کد ملی{' '}
-            <span className="text-muted-foreground">(اختیاری)</span>
-          </FieldLabel>
-          <FieldContent>
-            <Input
-              dir="ltr"
-              inputMode="numeric"
-              placeholder="2283409915"
-              aria-invalid={!!errors.nationalId}
-              {...register('nationalId')}
-            />
-            <FieldError>{errors.nationalId?.message}</FieldError>
-          </FieldContent>
-        </Field>
-      </div>
-      <Field>
-        <FieldLabel>
-          آدرس <span className="text-muted-foreground">(اختیاری)</span>
-        </FieldLabel>
-        <FieldContent>
-          <Textarea
-            placeholder="تهران، خیابان ولیعصر، کوچه بهار، پلاک ۱۲"
-            aria-invalid={!!errors.address}
-            {...register('address')}
-          />
-          <FieldError>{errors.address?.message}</FieldError>
-        </FieldContent>
-      </Field>
+      </fieldset>
       <div className="flex items-center gap-2 pt-2">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? customer
-              ? 'در حال ثبت تغییرات…'
-              : 'در حال ثبت…'
-            : customer
-              ? 'ثبت تغییرات'
-              : 'ثبت مشتری'}
+          {isSubmitting && <Spinner />}
+          ذخیره
         </Button>
         {onCancelled && (
           <Button

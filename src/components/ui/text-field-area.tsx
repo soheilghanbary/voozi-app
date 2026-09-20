@@ -11,16 +11,24 @@ type TextFieldAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
   label: string
   description?: string
   error?: string
+  fieldClass?: string
 }
 
 export const TextFieldArea = forwardRef(function MyInput(
-  { label, className, error, description, ...rest }: TextFieldAreaProps,
+  {
+    label,
+    className,
+    error,
+    description,
+    fieldClass,
+    ...rest
+  }: TextFieldAreaProps,
   ref: ForwardedRef<HTMLTextAreaElement>
 ) {
   return (
     <div className={cn('grid gap-2 [&>label]:text-sm', className)}>
       <Label>{label}</Label>
-      <Textarea ref={ref} {...rest} />
+      <Textarea ref={ref} className={cn(fieldClass)} {...rest} />
       {description && (
         <span className="text-muted-foreground text-xs">{description}</span>
       )}

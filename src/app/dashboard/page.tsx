@@ -3,7 +3,6 @@ import {
   Banknote,
   Check,
   ChevronLeft,
-  ListTodo,
   Package,
   Plus,
   ReceiptText,
@@ -59,15 +58,17 @@ function StatCard({
   sub,
   icon,
   accent,
+  className,
 }: {
   label: string
   value: string
   sub?: string
   icon: React.ReactNode
   accent: string
+  className?: string
 }) {
   return (
-    <Card className="p-4">
+    <Card className={cn('p-4', className)}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
           <p className="text-muted-foreground text-xs">{label}</p>
@@ -149,7 +150,6 @@ async function StatCardsSection({
   invoices,
   customers,
   products,
-  tasks,
   profile,
 }: {
   invoices: InvoicesPromise
@@ -158,8 +158,8 @@ async function StatCardsSection({
   tasks: TasksPromise
   profile: ProfilePromise
 }) {
-  const [invoicesData, customersData, productsData, tasksData, profileData] =
-    await Promise.all([invoices, customers, products, tasks, profile])
+  const [invoicesData, customersData, productsData, profileData] =
+    await Promise.all([invoices, customers, products, profile])
 
   const currencyLabel = CURRENCY[profileData.currency].label
   const invoiceCount = invoicesData.filter((i) => i.type === 'invoice').length
@@ -167,17 +167,16 @@ async function StatCardsSection({
   const invoiceTotal = invoicesData
     .filter((i) => i.type === 'invoice')
     .reduce((sum, i) => sum + i.total, 0)
-  const openTasks = tasksData.filter((t) => !t.completedAt).length
-  const doneTasks = tasksData.filter((t) => !!t.completedAt).length
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
       <StatCard
         label={`فروش کل (${currencyLabel})`}
         value={money(invoiceTotal)}
         sub={`بر اساس ${invoiceCount} فاکتور فروش`}
         icon={<Banknote className="size-5 text-primary" />}
         accent="bg-primary/10 text-primary"
+        className="md:col-span-3 lg:col-span-1"
       />
       <StatCard
         label="تعداد فاکتورها"
@@ -197,13 +196,6 @@ async function StatCardsSection({
         value={money(productsData.length)}
         icon={<Package className="size-5 text-amber-600" />}
         accent="bg-amber-600/10 text-amber-600"
-      />
-      <StatCard
-        label="وظایف"
-        value={money(openTasks)}
-        sub={`${money(doneTasks)} تکمیل‌شده از ${money(tasksData.length)}`}
-        icon={<ListTodo className="size-5 text-sky-600" />}
-        accent="bg-sky-600/10 text-sky-600"
       />
     </div>
   )
@@ -561,16 +553,7 @@ export default async function Page() {
       <PageHeader
         title="پیشخوان"
         description={dateFormatter.format(new Date())}
-      >
-        <Button
-          nativeButton={false}
-          render={<Link href="/dashboard/invoices/new" />}
-        >
-          <Plus />
-          فاکتور جدید
-        </Button>
-      </PageHeader>
-
+      />
       <Suspense fallback={<StatCardsSkeleton />}>
         <StatCardsSection
           invoices={invoices}

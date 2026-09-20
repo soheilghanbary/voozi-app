@@ -18,11 +18,6 @@ export const customerFormSchema = z.object({
     .string()
     .trim()
     .refine((value) => value === '' || value.length >= 5, 'آدرس را وارد کنید'),
-  nationalId: z
-    .string()
-    .trim()
-    .regex(/^\d{10}$|^\d{11}$/, 'شناسه ملی یا کد ملی نامعتبر است')
-    .or(z.literal('')),
 })
 
 export type CustomerFormValues = z.infer<typeof customerFormSchema>

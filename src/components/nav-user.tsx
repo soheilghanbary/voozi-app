@@ -79,9 +79,6 @@ export function NavUser() {
                   <span className="truncate font-medium">
                     {user.name ?? 'کاربر'}
                   </span>
-                  {user.email && (
-                    <span className="truncate text-xs">{user.email}</span>
-                  )}
                 </div>
                 <ChevronsUpDownIcon className="ms-auto size-4" />
               </>

@@ -39,7 +39,7 @@ export function ProductFormDialog({
       onOpenChange={handleOpenChange}
     >
       {trigger && <DialogTrigger render={trigger} />}
-      <DialogContent className="max-h-[calc(100dvh-4rem)] overflow-y-auto sm:max-w-xl">
+      <DialogContent className="max-h-[calc(100dvh-4rem)] sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{product ? 'ویرایش محصول' : 'محصول جدید'}</DialogTitle>
           <DialogDescription>

@@ -23,13 +23,7 @@ export function DataTableViewOptions<TData extends RowData>({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        render={
-          <Button
-            variant="outline"
-            size="sm"
-            className="ms-auto hidden h-7 lg:flex"
-          />
-        }
+        render={<Button variant="outline" className="ms-auto hidden lg:flex" />}
       >
         <Settings2 />
         نمایش ستون‌ها

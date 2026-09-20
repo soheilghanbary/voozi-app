@@ -1,9 +1,8 @@
 'use client'
-
-import { cn } from 'cn'
 import { OTPInput, OTPInputContext } from 'input-otp'
 import { MinusIcon } from 'lucide-react'
 import * as React from 'react'
+import { cn } from '@/lib/utils'
 
 function InputOTP({
   className,
@@ -30,8 +29,10 @@ function InputOTPGroup({ className, ...props }: React.ComponentProps<'div'>) {
   return (
     <div
       data-slot="input-otp-group"
+      style={{ direction: 'ltr' }}
+      dir="ltr"
       className={cn(
-        'flex items-center rounded-lg has-aria-invalid:border-destructive has-aria-invalid:ring-3 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40',
+        'mx-auto flex items-center gap-x-2 rounded-2xl has-aria-invalid:border-destructive has-aria-invalid:ring-3 has-aria-invalid:ring-destructive/20 dark:has-aria-invalid:ring-destructive/40',
         className
       )}
       {...props}
@@ -54,7 +55,7 @@ function InputOTPSlot({
       data-slot="input-otp-slot"
       data-active={isActive}
       className={cn(
-        'relative flex size-8 items-center justify-center border-input border-y border-e text-sm outline-none transition-all first:rounded-s-lg first:border-s last:rounded-e-lg aria-invalid:border-destructive data-[active=true]:z-10 data-[active=true]:border-ring data-[active=true]:ring-3 data-[active=true]:ring-ring/50 data-[active=true]:aria-invalid:border-destructive data-[active=true]:aria-invalid:ring-destructive/20 dark:bg-input/30 dark:data-[active=true]:aria-invalid:ring-destructive/40',
+        'relative flex size-12 items-center justify-center rounded-md border border-border bg-card text-base outline-none transition-[color,box-shadow] duration-200 aria-invalid:border-destructive data-[active=true]:z-10 data-[active=true]:border-ring data-[active=true]:ring-3 data-[active=true]:ring-ring/30 data-[active=true]:aria-invalid:ring-destructive/20 dark:data-[active=true]:aria-invalid:ring-destructive/40',
         className
       )}
       {...props}
@@ -62,7 +63,7 @@ function InputOTPSlot({
       {char}
       {hasFakeCaret && (
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <div className="h-4 w-px animate-caret-blink bg-foreground duration-1000" />
+          <div className="h-4 w-px animate-caret-blink bg-muted-foreground duration-1000" />
         </div>
       )}
     </div>

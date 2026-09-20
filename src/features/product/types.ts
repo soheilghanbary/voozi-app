@@ -1,5 +1,5 @@
 export const PRODUCT_TYPE = {
-  product: { label: 'محصول' },
+  product: { label: 'اقلام' },
   service: { label: 'خدمات' },
 } as const
 

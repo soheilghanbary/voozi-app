@@ -19,10 +19,7 @@ const filterFn_customerSearch = constructFilterFn({
       .trim()
       .toLowerCase()
     const customer = row.original as Customer
-    return (
-      customer.name.toLowerCase().includes(value) ||
-      customer.nationalId.toLowerCase().includes(value)
-    )
+    return customer.name.toLowerCase().includes(value)
   },
   autoRemove: (filterValue) => !String(filterValue ?? '').trim(),
 })

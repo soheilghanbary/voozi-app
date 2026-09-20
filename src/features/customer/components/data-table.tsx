@@ -38,20 +38,14 @@ export function DataTable<TData extends RowData>({
         <div className="relative w-full min-w-0 max-w-sm">
           <SearchIcon className="pointer-events-none absolute inset-s-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="جستجوی نام یا شناسه ملی..."
+            placeholder="جستجوی نام..."
             value={searchValue}
             onChange={(event) => handleSearch(event.target.value)}
             className="ps-8 pe-2"
           />
         </div>
         <div className="ms-auto flex items-center gap-2">
-          <CustomerFormDialog
-            trigger={
-              <Button size="sm" className="h-7">
-                مشتری جدید
-              </Button>
-            }
-          />
+          <CustomerFormDialog trigger={<Button>مشتری جدید</Button>} />
           <DataTableViewOptions table={table} />
         </div>
       </div>

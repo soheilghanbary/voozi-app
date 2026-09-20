@@ -58,7 +58,6 @@ export const AmountField = ({
       disabled={disabled}
       onChange={handleChange}
       error={error}
-      inputClass="text-base font-bold"
     />
   )
 }
