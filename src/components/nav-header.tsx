@@ -17,7 +17,7 @@ export const NavHeader = () => {
   }
 
   return (
-    <header className="p-2">
+    <header className="mx-3 mt-2 rounded-md border border-border/65 bg-card p-2 shadow-xs">
       <nav className="flex items-center gap-x-2">
         <SidebarTrigger className="ms-1 ml-auto" />
         <ModeToggle />

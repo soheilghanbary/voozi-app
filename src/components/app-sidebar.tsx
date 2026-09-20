@@ -19,7 +19,6 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-  useSidebar,
 } from '@/components/ui/sidebar'
 import { cn } from '@/lib/utils'
 
@@ -62,26 +61,16 @@ export const menus = [
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { state } = useSidebar()
-
   return (
     <Sidebar {...props}>
-      <SidebarHeader className="p-4 pb-2">
-        <div className="flex items-center gap-2">
+      <SidebarHeader className="flex items-center justify-between p-4 pb-2 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-3">
+        <div className="flex w-full items-center justify-start text-primary dark:text-foreground">
           <Logo
-            className={cn(
-              'size-6 text-primary transition-[width,height] duration-200 ease-linear',
-              state === 'collapsed' && 'size-5'
-            )}
+            className={cn('size-6 transition-all duration-200 ease-linear')}
           />
-          <p
-            className={cn(
-              'font-black text-base/6',
-              state === 'collapsed' && 'hidden'
-            )}
-          >
-            وزیا
-          </p>
+          <span className="ms-1 font-black text-lg group-data-[collapsible=icon]:hidden">
+            VEZIA
+          </span>
         </div>
       </SidebarHeader>
       <SidebarContent>
