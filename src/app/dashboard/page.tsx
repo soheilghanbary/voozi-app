@@ -14,6 +14,7 @@ import { Suspense } from 'react'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
 import { countCustomers } from '@/features/customer/api/queries'
 import { QuickAddCustomerCard } from '@/features/customer/components/quick-add-customer-card'
 import { listInvoices } from '@/features/invoice/api/queries'
@@ -93,8 +94,8 @@ function StatCardsSkeleton() {
     <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, index) => (
         <div key={index} className="space-y-3 rounded-lg border p-4">
-          <div className="h-3 w-20 animate-pulse rounded bg-muted" />
-          <div className="h-7 w-28 animate-pulse rounded bg-muted" />
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-7 w-28" />
         </div>
       ))}
     </div>
@@ -105,21 +106,15 @@ function SalesOverviewSkeleton() {
   return (
     <div className="grid gap-4 xl:grid-cols-3">
       <div className="space-y-3 rounded-lg border p-5 xl:col-span-2">
-        <div className="h-5 w-32 animate-pulse rounded bg-muted" />
+        <Skeleton className="h-5 w-32" />
         {Array.from({ length: 5 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-10 animate-pulse rounded-lg bg-muted/60"
-          />
+          <Skeleton key={index} className="h-10 rounded-lg" />
         ))}
       </div>
       <div className="space-y-3 rounded-lg border p-5">
-        <div className="h-5 w-24 animate-pulse rounded bg-muted" />
+        <Skeleton className="h-5 w-24" />
         {Array.from({ length: 3 }).map((_, index) => (
-          <div
-            key={index}
-            className="h-9 animate-pulse rounded-lg bg-muted/60"
-          />
+          <Skeleton key={index} className="h-9 rounded-lg" />
         ))}
       </div>
     </div>
@@ -131,12 +126,9 @@ function RecentActivitySkeleton() {
     <div className="grid gap-4 xl:grid-cols-2">
       {Array.from({ length: 2 }).map((_, index) => (
         <div key={index} className="space-y-3 rounded-lg border p-5">
-          <div className="h-5 w-28 animate-pulse rounded bg-muted" />
+          <Skeleton className="h-5 w-28" />
           {Array.from({ length: 4 }).map((_, rowIndex) => (
-            <div
-              key={rowIndex}
-              className="h-10 animate-pulse rounded-lg bg-muted/60"
-            />
+            <Skeleton key={rowIndex} className="h-10 rounded-lg" />
           ))}
         </div>
       ))}

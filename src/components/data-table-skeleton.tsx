@@ -1,3 +1,4 @@
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   Table,
   TableBody,
@@ -21,10 +22,10 @@ export function DataTableSkeleton({
     <div className="space-y-4">
       {showToolbar && (
         <div className="flex flex-wrap items-center gap-2">
-          <div className="h-9 w-full max-w-sm animate-pulse rounded-md bg-muted" />
+          <Skeleton className="h-9 w-full max-w-sm" />
           <div className="ms-auto flex items-center gap-2">
-            <div className="h-7 w-28 animate-pulse rounded-md bg-muted" />
-            <div className="h-7 w-16 animate-pulse rounded-md bg-muted" />
+            <Skeleton className="h-7 w-28 rounded-md" />
+            <Skeleton className="h-7 w-16 rounded-md" />
           </div>
         </div>
       )}
@@ -34,7 +35,7 @@ export function DataTableSkeleton({
             <TableRow>
               {Array.from({ length: columns }).map((_, column) => (
                 <TableHead key={column} className="text-center">
-                  <div className="mx-auto h-3.5 w-16 animate-pulse rounded bg-muted" />
+                  <Skeleton className="mx-auto h-3.5 w-16" />
                 </TableHead>
               ))}
             </TableRow>
@@ -44,9 +45,9 @@ export function DataTableSkeleton({
               <TableRow key={row}>
                 {Array.from({ length: columns }).map((_, column) => (
                   <TableCell key={column} className="text-center">
-                    <div
+                    <Skeleton
                       className={cn(
-                        'mx-auto h-4 animate-pulse rounded bg-muted',
+                        'mx-auto h-4',
                         column === 0 && 'w-10',
                         column === columns - 1 && 'w-24'
                       )}
@@ -59,8 +60,8 @@ export function DataTableSkeleton({
         </Table>
       </div>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="h-8 w-36 animate-pulse rounded-md bg-muted" />
-        <div className="h-8 w-52 animate-pulse rounded-md bg-muted" />
+        <Skeleton className="h-8 w-36 rounded-md" />
+        <Skeleton className="h-8 w-52 rounded-md" />
       </div>
     </div>
   )
