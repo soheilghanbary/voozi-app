@@ -1,10 +1,7 @@
-import { call } from '@orpc/server'
 import { Suspense } from 'react'
 import { DataTableSkeleton } from '@/components/data-table-skeleton'
 import { PageHeader } from '@/components/page-header'
-import { listProducts } from '@/features/product/api/queries'
-import { columns } from '@/features/product/components/columns'
-import { DataTable } from '@/features/product/components/data-table'
+import { ProductsTable } from '@/features/product/components/products-table'
 
 export default function Page() {
   return (
@@ -15,9 +12,4 @@ export default function Page() {
       </Suspense>
     </div>
   )
-}
-
-async function ProductsTable() {
-  const products = await call(listProducts)
-  return <DataTable columns={columns} data={products} />
 }

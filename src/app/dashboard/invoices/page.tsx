@@ -1,10 +1,7 @@
-import { call } from '@orpc/server'
 import { Suspense } from 'react'
 import { DataTableSkeleton } from '@/components/data-table-skeleton'
 import { PageHeader } from '@/components/page-header'
-import { listInvoices } from '@/features/invoice/api/queries'
-import { columns } from '@/features/invoice/components/columns'
-import { DataTable } from '@/features/invoice/components/data-table'
+import { InvoicesTable } from '@/features/invoice/components/invoices-table'
 
 export default function Page() {
   return (
@@ -15,9 +12,4 @@ export default function Page() {
       </Suspense>
     </div>
   )
-}
-
-async function InvoicesTable() {
-  const invoices = await call(listInvoices)
-  return <DataTable columns={columns} data={invoices} />
 }

@@ -1,8 +1,8 @@
 'use client'
 
 import { ORPCError } from '@orpc/client'
+import { useQueryClient } from '@tanstack/react-query'
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -20,12 +20,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { api } from '@/server/orpc/client'
+import { api, client } from '@/server/orpc/client'
 import type { Customer } from '../types'
 import { CustomerFormDialog } from './customer-form-dialog'
 
 export function DataTableRowActions({ customer }: { customer: Customer }) {
-  const router = useRouter()
+  const queryClient = useQueryClient()
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -36,7 +36,7 @@ export function DataTableRowActions({ customer }: { customer: Customer }) {
       await api.customers.delete({ id: customer.id })
       toast.success('مشتری با موفقیت حذف شد.')
       setDeleteOpen(false)
-      router.refresh()
+      queryClient.invalidateQueries({ queryKey: client.customers.list.key() })
     } catch (error) {
       if (error instanceof ORPCError && error.code === 'NOT_FOUND') {
         toast.error('این مشتری یافت نشد.')

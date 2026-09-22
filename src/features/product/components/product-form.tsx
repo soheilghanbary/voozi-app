@@ -1,7 +1,7 @@
 'use client'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ORPCError } from '@orpc/client'
-import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { AmountField } from '@/components/amount-field'
@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input'
 import { SelectField } from '@/components/ui/select-field'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { api } from '@/server/orpc/client'
+import { api, client } from '@/server/orpc/client'
 import {
   PRODUCT_TYPE,
   PRODUCT_UNITS,
@@ -54,7 +54,7 @@ export function ProductForm({
   onSaved?: () => void
   onCancelled?: () => void
 }) {
-  const router = useRouter()
+  const queryClient = useQueryClient()
   const {
     register,
     control,
@@ -70,14 +70,12 @@ export function ProductForm({
       if (product) {
         await api.products.update({ id: product.id, ...values })
         toast.success('محصول با موفقیت ویرایش شد.')
-        router.refresh()
-        onSaved?.()
       } else {
         await api.products.create(values)
         toast.success('محصول جدید با موفقیت ثبت شد.')
-        router.refresh()
-        onSaved?.()
       }
+      queryClient.invalidateQueries({ queryKey: client.products.list.key() })
+      onSaved?.()
     } catch (error) {
       if (error instanceof ORPCError && error.code === 'NOT_FOUND') {
         toast.error('این محصول یافت نشد.')

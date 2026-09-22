@@ -1,9 +1,9 @@
 'use client'
 
+import { useQueryClient } from '@tanstack/react-query'
 import type { ColumnDef, RowData } from '@tanstack/react-table'
 import { SearchIcon, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -24,7 +24,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { api } from '@/server/orpc/client'
+import { api, client } from '@/server/orpc/client'
 import { useInvoiceTable } from '../hooks/use-invoice-table'
 import type { InvoiceTableFeatures } from '../utils/data-table-features'
 import { DataTablePagination } from './data-table-pagination'
@@ -39,7 +39,7 @@ export function DataTable<TData extends RowData>({
   columns,
   data,
 }: DataTableProps<TData>) {
-  const router = useRouter()
+  const queryClient = useQueryClient()
   const { table, searchValue, handleSearch } = useInvoiceTable({
     columns,
     data,
@@ -63,7 +63,7 @@ export function DataTable<TData extends RowData>({
       toast.success('فاکتورهای انتخاب‌شده حذف شدند.')
       setDeleteOpen(false)
       table.resetRowSelection()
-      router.refresh()
+      queryClient.invalidateQueries({ queryKey: client.invoices.list.key() })
     } catch (_error) {
       toast.error('حذف فاکتورها ناموفق بود. دوباره تلاش کنید.')
     } finally {

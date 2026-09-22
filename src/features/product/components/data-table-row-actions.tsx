@@ -1,8 +1,8 @@
 'use client'
 
 import { ORPCError } from '@orpc/client'
+import { useQueryClient } from '@tanstack/react-query'
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react'
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -20,12 +20,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { api } from '@/server/orpc/client'
+import { api, client } from '@/server/orpc/client'
 import type { Product } from '../types'
 import { ProductFormDialog } from './product-form-dialog'
 
 export function DataTableRowActions({ product }: { product: Product }) {
-  const router = useRouter()
+  const queryClient = useQueryClient()
   const [editOpen, setEditOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -36,7 +36,7 @@ export function DataTableRowActions({ product }: { product: Product }) {
       await api.products.delete({ id: product.id })
       toast.success('محصول با موفقیت حذف شد.')
       setDeleteOpen(false)
-      router.refresh()
+      queryClient.invalidateQueries({ queryKey: client.products.list.key() })
     } catch (error) {
       if (error instanceof ORPCError && error.code === 'NOT_FOUND') {
         toast.error('این محصول یافت نشد.')

@@ -1,7 +1,7 @@
 'use client'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useRouter } from 'next/navigation'
+import { useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -15,7 +15,7 @@ import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
-import { api } from '@/server/orpc/client'
+import { api, client } from '@/server/orpc/client'
 import type { Customer } from '../types'
 import { CUSTOMER_TYPE, type CustomerType } from '../types'
 import {
@@ -50,7 +50,7 @@ export function CustomerForm({
   onSaved?: () => void
   onCancelled?: () => void
 }) {
-  const router = useRouter()
+  const queryClient = useQueryClient()
   const {
     register,
     control,
@@ -70,7 +70,7 @@ export function CustomerForm({
         await api.customers.create(values)
         toast.success('مشتری جدید با موفقیت افزوده شد.')
       }
-      router.refresh()
+      queryClient.invalidateQueries({ queryKey: client.customers.list.key() })
       onSaved?.()
     } catch {
       toast.error('ثبت مشتری ناموفق بود. دوباره تلاش کنید.')
