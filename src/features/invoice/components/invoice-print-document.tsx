@@ -243,7 +243,7 @@ export function InvoicePrintDocument({
               {invoice.items.map((item, index) => (
                 <TableRow
                   key={item.id}
-                  className="border-zinc-100 odd:bg-zinc-50/40 hover:bg-transparent"
+                  className="border-zinc-100 odd:bg-zinc-50/40 hover:bg-transparent dark:bg-white"
                 >
                   <TableCell className="px-3 py-3 text-center text-sm text-zinc-500 tabular-nums">
                     {money(index + 1)}
