@@ -9,6 +9,7 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
 import { NOTE_COLORS } from '@/features/note/utils/note-colors'
+import { INVOICE_COLORS } from '@/features/settings/utils/invoice-colors'
 import { PRIORITIES } from '@/features/task/utils/task-priority'
 
 export const user = pgTable('user', {
@@ -256,6 +257,11 @@ export const businessProfile = pgTable(
       enum: ['rial', 'toman'],
     })
       .default('toman')
+      .notNull(),
+    invoiceColor: text('invoice_color', {
+      enum: [...INVOICE_COLORS],
+    })
+      .default('indigo')
       .notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at')

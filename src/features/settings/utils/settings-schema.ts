@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { CURRENCY, type Currency } from '../types'
+import { INVOICE_COLORS } from './invoice-colors'
 
 const typeKeys = Object.keys(CURRENCY) as [Currency, ...Currency[]]
 
@@ -20,6 +21,7 @@ export const businessProfileFormSchema = z.object({
   tel: z.string().trim().max(20, 'تلفن ثابت حداکثر ۲۰ حرف باشد').optional(),
   website: z.string().trim().max(80, 'وب‌سایت حداکثر ۸۰ حرف باشد').optional(),
   currency: z.enum(typeKeys).optional(),
+  invoiceColor: z.enum(INVOICE_COLORS).optional(),
 })
 
 export type BusinessProfileFormValues = z.infer<

@@ -1,7 +1,6 @@
 // biome-ignore-all lint/performance/noImgElement: brand logo and signature are stored as data URLs in the database
 
 import { FileText, Globe, Phone, Smartphone } from 'lucide-react'
-
 import {
   Table,
   TableBody,
@@ -12,6 +11,11 @@ import {
 } from '@/components/ui/table'
 import { appConfig } from '@/config'
 import { CURRENCY } from '@/features/settings/types'
+import {
+  INVOICE_COLOR_STYLES,
+  type InvoiceColor,
+} from '@/features/settings/utils/invoice-colors'
+import { cn } from '@/lib/utils'
 import { INVOICE_TYPE, type InvoiceDetail } from '../types'
 import { dateFormatter, numberFormatter } from '../utils/format'
 
@@ -50,6 +54,7 @@ export function InvoicePrintDocument({
     tel?: string | null
     website?: string | null
     currency?: 'rial' | 'toman' | null
+    invoiceColor?: InvoiceColor | null
   } | null
 }) {
   const totals = computeTotals(invoice)
@@ -62,10 +67,11 @@ export function InvoicePrintDocument({
   const brandName = profile?.name?.trim() || appConfig.name
   const brandTitle = profile?.title?.trim()
   const currency = profile?.currency ?? 'toman'
+  const accent = INVOICE_COLOR_STYLES[profile?.invoiceColor ?? 'indigo']
 
   return (
     <div className="mx-auto max-w-full overflow-hidden rounded-2xl bg-white text-zinc-900 ring-1 ring-zinc-200 print:w-auto print:max-w-none print:rounded-none print:shadow-none print:ring-0">
-      <div className="h-1.5 bg-linear-to-l from-primary via-primary/60 to-primary/10" />
+      <div className={cn('h-1.5 bg-linear-to-l', accent.bar)} />
 
       <div className="px-4 pt-8 pb-10 sm:px-10 print:px-4 print:pt-4 print:pb-4">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
@@ -78,7 +84,7 @@ export function InvoicePrintDocument({
               />
             ) : (
               <div className="grid size-12 place-items-center rounded-2xl border text-primary-foreground shadow-xs">
-                <FileText className="size-6 text-blue-500" />
+                <FileText className={cn('size-6', accent.accentText)} />
               </div>
             )}
             <div className="space-y-0.5">
@@ -156,7 +162,12 @@ export function InvoicePrintDocument({
             </p>
             <p className="font-bold text-sm text-zinc-900">{dueDate ?? '—'}</p>
           </div>
-          <div className="col-span-2 rounded-xl bg-primary/5 p-3.5 ring-1 ring-primary/10 sm:col-span-1">
+          <div
+            className={cn(
+              'col-span-2 rounded-xl p-3.5 ring-1 sm:col-span-1',
+              accent.soft
+            )}
+          >
             <p className="mb-1 font-medium text-[11px] text-zinc-500 tracking-wide">
               مبلغ نهایی
             </p>
@@ -170,25 +181,60 @@ export function InvoicePrintDocument({
           <Table>
             <TableHeader>
               <TableRow className="border-zinc-200 hover:bg-transparent">
-                <TableHead className="bg-zinc-50 px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide">
+                <TableHead
+                  className={cn(
+                    'px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide',
+                    accent.headerTint
+                  )}
+                >
                   ردیف
                 </TableHead>
-                <TableHead className="bg-zinc-50 px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide">
+                <TableHead
+                  className={cn(
+                    'px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide',
+                    accent.headerTint
+                  )}
+                >
                   شرح
                 </TableHead>
-                <TableHead className="bg-zinc-50 px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide">
+                <TableHead
+                  className={cn(
+                    'px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide',
+                    accent.headerTint
+                  )}
+                >
                   واحد
                 </TableHead>
-                <TableHead className="bg-zinc-50 px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide">
+                <TableHead
+                  className={cn(
+                    'px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide',
+                    accent.headerTint
+                  )}
+                >
                   تعداد
                 </TableHead>
-                <TableHead className="bg-zinc-50 px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide">
+                <TableHead
+                  className={cn(
+                    'px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide',
+                    accent.headerTint
+                  )}
+                >
                   قیمت واحد
                 </TableHead>
-                <TableHead className="bg-zinc-50 px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide">
+                <TableHead
+                  className={cn(
+                    'px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide',
+                    accent.headerTint
+                  )}
+                >
                   تخفیف
                 </TableHead>
-                <TableHead className="bg-zinc-50 px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide">
+                <TableHead
+                  className={cn(
+                    'px-3 py-2.5 text-center font-semibold text-[11px] text-zinc-500 tracking-wide',
+                    accent.headerTint
+                  )}
+                >
                   جمع
                 </TableHead>
               </TableRow>
@@ -307,7 +353,12 @@ export function InvoicePrintDocument({
               )}
               <div className="flex items-center justify-between text-sm text-zinc-600">
                 <span>مبلغ نهایی ({CURRENCY[currency].label})</span>
-                <span className="font-black text-xl tabular-nums">
+                <span
+                  className={cn(
+                    'font-black text-xl tabular-nums',
+                    accent.accentText
+                  )}
+                >
                   {money(totals.grandTotal)}
                 </span>
               </div>

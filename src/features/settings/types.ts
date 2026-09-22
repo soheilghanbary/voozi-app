@@ -1,3 +1,5 @@
+import type { InvoiceColor } from './utils/invoice-colors'
+
 export const CURRENCY = {
   toman: { label: 'تومان' },
   rial: { label: 'ریال' },
@@ -15,6 +17,7 @@ export type BusinessProfile = {
   tel: string | null
   website: string | null
   currency: Currency
+  invoiceColor: InvoiceColor
   completed: boolean
 }
 

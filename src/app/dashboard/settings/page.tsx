@@ -1,5 +1,5 @@
 import { call } from '@orpc/server'
-import { Banknote, Building2 } from 'lucide-react'
+import { Banknote, Building2, Palette } from 'lucide-react'
 import { Suspense } from 'react'
 import { PageHeader } from '@/components/page-header'
 import {
@@ -12,6 +12,7 @@ import {
 import { getBusinessProfile } from '@/features/settings/api/queries'
 import { BusinessProfileForm } from '@/features/settings/components/business-profile-form'
 import { CurrencyForm } from '@/features/settings/components/currency-form'
+import { InvoiceColorForm } from '@/features/settings/components/invoice-color-form'
 import type { BusinessProfile } from '@/features/settings/types'
 
 export const metadata = {
@@ -91,6 +92,31 @@ async function CurrencyCard({ profile }: { profile: ProfilePromise }) {
   )
 }
 
+async function InvoiceColorCard({ profile }: { profile: ProfilePromise }) {
+  const profileData = await profile
+
+  return (
+    <Card className="xl:h-fit">
+      <CardHeader>
+        <div className="flex items-start gap-3">
+          <div className="grid size-9 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+            <Palette className="size-4.5" />
+          </div>
+          <div>
+            <CardTitle>رنگ فاکتور</CardTitle>
+            <CardDescription>
+              رنگ پیش‌فرض برای ظاهر فاکتور در پیش‌نمایش و چاپ.
+            </CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <InvoiceColorForm invoiceColor={profileData.invoiceColor} />
+      </CardContent>
+    </Card>
+  )
+}
+
 export default function Page() {
   const profile = Promise.resolve(call(getBusinessProfile))
 
@@ -108,6 +134,9 @@ export default function Page() {
         </Suspense>
         <Suspense fallback={<SettingsCardSkeleton />}>
           <CurrencyCard profile={profile} />
+        </Suspense>
+        <Suspense fallback={<SettingsCardSkeleton />}>
+          <InvoiceColorCard profile={profile} />
         </Suspense>
       </div>
     </div>

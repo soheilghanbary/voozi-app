@@ -20,6 +20,7 @@ export const updateBusinessProfile = authed
     if (input.tel !== undefined) set.tel = input.tel
     if (input.website !== undefined) set.website = input.website
     if (input.currency !== undefined) set.currency = input.currency
+    if (input.invoiceColor !== undefined) set.invoiceColor = input.invoiceColor
 
     await db
       .insert(businessProfile)

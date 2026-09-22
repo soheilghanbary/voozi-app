@@ -6,6 +6,7 @@ import { db } from '@/server/db'
 import { businessProfile } from '@/server/db/schema'
 import { authed } from '@/server/orpc/context'
 import type { BusinessProfile } from '../types'
+import { INVOICE_COLORS } from '../utils/invoice-colors'
 
 const output = z.object({
   name: z.string().nullable(),
@@ -17,6 +18,7 @@ const output = z.object({
   tel: z.string().nullable(),
   website: z.string().nullable(),
   currency: z.enum(['rial', 'toman']),
+  invoiceColor: z.enum(INVOICE_COLORS),
   completed: z.boolean(),
 })
 
@@ -41,6 +43,7 @@ export const getBusinessProfile = authed
         tel: null,
         website: null,
         currency: 'toman',
+        invoiceColor: 'indigo',
         completed: false,
       }
     }
@@ -55,6 +58,7 @@ export const getBusinessProfile = authed
       tel: row.tel,
       website: row.website,
       currency: row.currency,
+      invoiceColor: row.invoiceColor,
       completed: Boolean(row.name?.trim()),
     }
   })

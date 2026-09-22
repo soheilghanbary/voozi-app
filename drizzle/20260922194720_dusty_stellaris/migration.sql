@@ -1,0 +1,1 @@
+ALTER TABLE "business_profile" ADD COLUMN "invoice_color" text DEFAULT 'indigo' NOT NULL;
