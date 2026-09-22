@@ -10,6 +10,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
@@ -134,13 +135,8 @@ export function TaskForm({
       </Field>
       <div className="flex items-center gap-2 pt-2">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? task
-              ? 'در حال ثبت تغییرات…'
-              : 'در حال ثبت…'
-            : task
-              ? 'ثبت تغییرات'
-              : 'ثبت وظیفه'}
+          {isSubmitting && <Spinner />}
+          {task ? 'ثبت تغییرات' : 'ثبت وظیفه'}
         </Button>
         {onCancelled && (
           <Button

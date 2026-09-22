@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Spinner } from '@/components/ui/spinner'
 import { api } from '@/server/orpc/client'
 import { CURRENCY, type Currency } from '../types'
 
@@ -53,7 +54,8 @@ export function CurrencyForm({ currency }: { currency: Currency }) {
         onClick={handleSubmit}
         disabled={isSubmitting || value === currency}
       >
-        {isSubmitting ? 'در حال ذخیره…' : 'ذخیره'}
+        {isSubmitting && <Spinner />}
+        ذخیره
       </Button>
     </div>
   )

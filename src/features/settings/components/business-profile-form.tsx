@@ -9,6 +9,7 @@ import { useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/ui/spinner'
 import { TextField } from '@/components/ui/text-field'
 import { Textarea } from '@/components/ui/textarea'
 import { api } from '@/server/orpc/client'
@@ -124,7 +125,7 @@ export function BusinessProfileForm({ profile }: { profile: BusinessProfile }) {
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors, isDirty, isSubmitting },
   } = useForm<BusinessProfileFormValues>({
     resolver: zodResolver(businessProfileFormSchema),
     defaultValues: {
@@ -220,8 +221,9 @@ export function BusinessProfileForm({ profile }: { profile: BusinessProfile }) {
         )}
       </div>
       <div className="flex items-center gap-2 sm:col-span-2">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'در حال ذخیره…' : 'ذخیره تغییرات'}
+        <Button type="submit" disabled={isSubmitting || !isDirty}>
+          {isSubmitting && <Spinner />}
+          ذخیره تغییرات
         </Button>
       </div>
     </form>

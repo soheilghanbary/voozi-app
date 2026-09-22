@@ -24,6 +24,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
@@ -773,13 +774,8 @@ export function InvoiceForm({
             className="flex-1 sm:flex-none"
             disabled={isSubmitting}
           >
-            {isSubmitting
-              ? invoice
-                ? 'در حال ثبت تغییرات…'
-                : 'در حال ثبت…'
-              : invoice
-                ? 'ثبت تغییرات'
-                : 'ثبت فاکتور'}
+            {isSubmitting && <Spinner />}
+            {invoice ? 'ثبت تغییرات' : 'ثبت فاکتور'}
           </Button>
         </div>
       </div>

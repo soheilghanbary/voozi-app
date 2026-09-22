@@ -10,6 +10,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 import type { Note } from '../types'
@@ -121,13 +122,8 @@ export function NoteForm({
       </Field>
       <div className="flex items-center gap-2 pt-2">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting
-            ? note
-              ? 'در حال ثبت تغییرات…'
-              : 'در حال ثبت…'
-            : note
-              ? 'ثبت تغییرات'
-              : 'ثبت یادداشت'}
+          {isSubmitting && <Spinner />}
+          {note ? 'ثبت تغییرات' : 'ثبت یادداشت'}
         </Button>
         {onCancelled && (
           <Button

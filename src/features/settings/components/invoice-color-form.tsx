@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
 import { api } from '@/server/orpc/client'
 import {
@@ -71,7 +72,8 @@ export function InvoiceColorForm({
         onClick={handleSubmit}
         disabled={isSubmitting || value === invoiceColor}
       >
-        {isSubmitting ? 'در حال ذخیره…' : 'ذخیره'}
+        {isSubmitting && <Spinner />}
+        ذخیره
       </Button>
     </div>
   )
