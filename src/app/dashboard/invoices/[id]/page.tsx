@@ -34,7 +34,7 @@ export default async function Page({
   const profile = await call(getBusinessProfile)
 
   return (
-    <div className="space-y-4 py-4">
+    <div className="space-y-6 py-6">
       <PageHeader
         backHref="/dashboard/invoices"
         backLabel="بازگشت به لیست فاکتورها"
@@ -51,8 +51,8 @@ export default async function Page({
         <InvoicePreviewActions invoiceId={invoice.id} />
       </PageHeader>
 
-      <section aria-label="پیش‌نمایش سند" className="print:bg-white print:p-0">
-        <div className="mx-auto max-w-4xl">
+      <section aria-label="پیش‌نمایش سند" className="print:p-0">
+        <div className="mx-auto max-w-5xl px-1 print:max-w-none print:px-0">
           <InvoicePrintDocument invoice={invoice} profile={profile} />
         </div>
       </section>

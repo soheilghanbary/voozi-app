@@ -77,21 +77,14 @@ const formatLive = (str: string) => {
 
 const money = (value: number) => numberFormatter.format(value)
 
-const SHEET_ORDER = [
-  'product',
-  'name',
-  'unit',
-  'qty',
-  'price',
-  'discount',
-] as const
+const SHEET_ORDER = ['product', 'name', 'qty', 'price', 'discount'] as const
 type SheetField = (typeof SHEET_ORDER)[number]
 
 const itemCellId = (index: number, field: SheetField) =>
   `invoice-item-${index}-${field}`
 
 const ITEM_GRID =
-  'lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1.05fr)_minmax(4.5rem,0.7fr)_minmax(4.75rem,0.75fr)_minmax(6rem,1fr)_minmax(6rem,1fr)_minmax(5.5rem,0.9fr)_2rem]'
+  'lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1.05fr)_minmax(4.75rem,0.75fr)_minmax(6rem,1fr)_minmax(6rem,1fr)_minmax(5.5rem,0.9fr)_2rem]'
 
 function NumericCell({
   id,
@@ -312,14 +305,20 @@ export function InvoiceForm({
   async function onSubmit(values: InvoiceFormValues) {
     const items = values.items
       .filter((item) => item.productId || (item.name?.trim() ?? '') !== '')
-      .map((item) => ({
-        productId: item.productId ?? null,
-        name: item.name?.trim() ?? '',
-        unit: item.unit?.trim() ?? '',
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        discount: item.discount,
-      }))
+      .map((item) => {
+        const product = products.find((p) => p.id === item.productId)
+        return {
+          productId: item.productId ?? null,
+          name: item.name?.trim() ?? '',
+          unit:
+            (product ? PRODUCT_UNITS[product.unit].label : null) ??
+            item.unit?.trim() ??
+            'عدد',
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          discount: item.discount,
+        }
+      })
     const payload = { ...values, items }
     try {
       if (invoice) {
@@ -369,165 +368,329 @@ export function InvoiceForm({
       onSubmit={handleSubmit(onSubmit, onInvalidSubmit)}
       className="space-y-6"
     >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <Controller
-          control={control}
-          name="type"
-          render={({ field }) => (
-            <Tabs value={field.value} onValueChange={field.onChange}>
-              <TabsList>
-                {(Object.keys(INVOICE_TYPE) as InvoiceType[]).map((type) => (
-                  <TabsTrigger key={type} value={type} className="gap-1.5">
-                    {type === 'proforma' ? <FileText /> : <ReceiptText />}
-                    {INVOICE_TYPE[type].label}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-          )}
-        />
-      </div>
+      <fieldset disabled={isSubmitting} className="space-y-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Controller
+            control={control}
+            name="type"
+            render={({ field }) => (
+              <Tabs value={field.value} onValueChange={field.onChange}>
+                <TabsList>
+                  {(Object.keys(INVOICE_TYPE) as InvoiceType[]).map((type) => (
+                    <TabsTrigger key={type} value={type} className="gap-1.5">
+                      {type === 'proforma' ? <FileText /> : <ReceiptText />}
+                      {INVOICE_TYPE[type].label}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </Tabs>
+            )}
+          />
+        </div>
 
-      <div className="grid gap-5 md:grid-cols-12">
-        <Field className="md:col-span-6">
-          <FieldLabel>مشتری</FieldLabel>
-          <FieldContent>
+        <div className="grid gap-5 md:grid-cols-12">
+          <Field className="md:col-span-6">
+            <FieldLabel>مشتری</FieldLabel>
+            <FieldContent>
+              <Controller
+                control={control}
+                name="customerId"
+                render={({ field }) => (
+                  <Combobox
+                    items={customers}
+                    itemToStringLabel={(customer) => customer.name}
+                    itemToStringValue={(customer) => customer.id}
+                    value={
+                      customers.find(
+                        (customer) => customer.id === field.value
+                      ) ?? null
+                    }
+                    onValueChange={(customer) =>
+                      field.onChange(customer?.id ?? '')
+                    }
+                  >
+                    <ComboboxInput
+                      placeholder="جستجوی مشتری..."
+                      aria-invalid={!!errors.customerId}
+                      onBlur={field.onBlur}
+                    />
+                    <ComboboxContent>
+                      <ComboboxEmpty>مشتری‌ای یافت نشد.</ComboboxEmpty>
+                      <ComboboxList>
+                        {(customer: Customer) => (
+                          <ComboboxItem key={customer.id} value={customer}>
+                            <span className="truncate font-medium">
+                              {customer.name}
+                            </span>
+                          </ComboboxItem>
+                        )}
+                      </ComboboxList>
+                    </ComboboxContent>
+                  </Combobox>
+                )}
+              />
+              <FieldError>{errors.customerId?.message}</FieldError>
+            </FieldContent>
+          </Field>
+
+          <div className="md:col-span-3">
             <Controller
               control={control}
-              name="customerId"
+              name="discount"
               render={({ field }) => (
-                <Combobox
-                  items={customers}
-                  itemToStringLabel={(customer) => customer.name}
-                  itemToStringValue={(customer) => customer.id}
-                  value={
-                    customers.find((customer) => customer.id === field.value) ??
-                    null
-                  }
-                  onValueChange={(customer) =>
-                    field.onChange(customer?.id ?? '')
-                  }
-                >
-                  <ComboboxInput
-                    placeholder="جستجوی مشتری..."
-                    aria-invalid={!!errors.customerId}
-                    onBlur={field.onBlur}
-                  />
-                  <ComboboxContent>
-                    <ComboboxEmpty>مشتری‌ای یافت نشد.</ComboboxEmpty>
-                    <ComboboxList>
-                      {(customer: Customer) => (
-                        <ComboboxItem key={customer.id} value={customer}>
-                          <span className="truncate font-medium">
-                            {customer.name}
-                          </span>
-                        </ComboboxItem>
-                      )}
-                    </ComboboxList>
-                  </ComboboxContent>
-                </Combobox>
+                <AmountField
+                  label={`تخفیف (${currencyLabel})`}
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.discount?.message}
+                />
               )}
             />
-            <FieldError>{errors.customerId?.message}</FieldError>
-          </FieldContent>
-        </Field>
-
-        <div className="md:col-span-3">
-          <Controller
-            control={control}
-            name="discount"
-            render={({ field }) => (
-              <AmountField
-                label={`تخفیف (${currencyLabel})`}
-                value={field.value}
-                onChange={field.onChange}
-                error={errors.discount?.message}
-              />
-            )}
-          />
-        </div>
-
-        <div className="md:col-span-3">
-          <Controller
-            control={control}
-            name="taxRate"
-            render={({ field }) => (
-              <AmountField
-                label="درصد مالیات"
-                value={field.value}
-                onChange={field.onChange}
-                error={errors.taxRate?.message}
-              />
-            )}
-          />
-        </div>
-      </div>
-
-      <div className="space-y-3 rounded-lg border bg-card/60 p-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            <h2 className="font-bold">اقلام فاکتور</h2>
-            <span className="rounded-full bg-muted px-2 py-0.5 font-medium text-muted-foreground text-xs tabular-nums">
-              {fields.length}
-            </span>
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleAddRow}
-          >
-            <Plus />
-            افزودن ردیف
-          </Button>
-        </div>
 
-        <p className="text-muted-foreground text-sm">
-          با انتخاب کالا از لیست، نام، واحد و قیمت به‌صورت خودکار پر می‌شود؛ با
-          Enter به سلول بعدی بروید.
-        </p>
-
-        {errors.items?.root?.message ? (
-          <p className="text-destructive text-sm">
-            {errors.items.root.message}
-          </p>
-        ) : null}
-
-        <div
-          className={cn(
-            'hidden items-center pb-1 font-medium text-muted-foreground text-xs lg:grid',
-            ITEM_GRID,
-            'lg:gap-4'
-          )}
-        >
-          <h3 className="col-span-2">کالا / نام</h3>
-          <h3>واحد</h3>
-          <h3 className="text-center">تعداد</h3>
-          <h3>قیمت واحد</h3>
-          <h3>تخفیف</h3>
-          <h3 className="text-end">جمع ردیف</h3>
-          <span />
-        </div>
-
-        <div className="space-y-3">
-          {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className={cn(
-                'grid grid-cols-1 gap-3 rounded-lg border bg-background p-3',
-                ITEM_GRID,
-                'lg:items-center lg:gap-4'
+          <div className="md:col-span-3">
+            <Controller
+              control={control}
+              name="taxRate"
+              render={({ field }) => (
+                <AmountField
+                  label="درصد مالیات"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.taxRate?.message}
+                />
               )}
-            >
-              <div className="flex items-center justify-between lg:hidden">
-                <span className="font-medium text-muted-foreground text-xs">
-                  ردیف {index + 1}
-                </span>
+            />
+          </div>
+        </div>
+
+        <div className="space-y-3 rounded-lg border bg-card/60 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h2 className="font-bold">اقلام فاکتور</h2>
+              <span className="rounded-full bg-muted px-2 py-0.5 font-medium text-muted-foreground text-xs tabular-nums">
+                {fields.length}
+              </span>
+            </div>
+            <Button type="button" variant="secondary" onClick={handleAddRow}>
+              <Plus />
+              افزودن ردیف
+            </Button>
+          </div>
+
+          {errors.items?.root?.message ? (
+            <p className="text-destructive text-sm">
+              {errors.items.root.message}
+            </p>
+          ) : null}
+
+          <div
+            className={cn(
+              'hidden items-center pb-1 font-medium text-muted-foreground text-xs lg:grid',
+              ITEM_GRID,
+              'lg:gap-4'
+            )}
+          >
+            <h3 className="col-span-2">کالا / نام</h3>
+            <h3 className="text-center">تعداد</h3>
+            <h3>قیمت واحد</h3>
+            <h3>تخفیف</h3>
+            <h3 className="text-end">جمع ردیف</h3>
+            <span />
+          </div>
+
+          <div className="space-y-3">
+            {fields.map((field, index) => (
+              <div
+                key={field.id}
+                className={cn(
+                  'grid grid-cols-1 gap-3 rounded-lg border bg-background p-3',
+                  ITEM_GRID,
+                  'lg:items-center lg:gap-4'
+                )}
+              >
+                <div className="flex items-center justify-between lg:hidden">
+                  <span className="font-medium text-muted-foreground text-xs">
+                    ردیف {index + 1}
+                  </span>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-sm"
+                    className="text-muted-foreground"
+                    disabled={singleRow}
+                    onClick={() => handleRemove(index)}
+                    aria-label={`حذف ردیف ${index + 1}`}
+                  >
+                    <Trash2 />
+                  </Button>
+                </div>
+
+                <Field className="min-w-0">
+                  <FieldLabel className="lg:hidden">کالا یا خدمت</FieldLabel>
+                  <FieldContent>
+                    <Controller
+                      control={control}
+                      name={`items.${index}.productId`}
+                      render={({ field: productField }) => {
+                        const selectedProduct = products.find(
+                          (product) => product.id === productField.value
+                        )
+                        return (
+                          <Combobox
+                            items={products}
+                            itemToStringLabel={(product) => product.name}
+                            itemToStringValue={(product) => product.id}
+                            value={selectedProduct ?? null}
+                            onValueChange={(product) =>
+                              handleProductChange(
+                                index,
+                                product ? product.id : null
+                              )
+                            }
+                          >
+                            <ComboboxInput
+                              id={itemCellId(index, 'product')}
+                              placeholder="انتخاب کالا یا خدمت..."
+                              aria-invalid={!!errors.items?.[index]?.name}
+                              showClear={false}
+                              onBlur={productField.onBlur}
+                            />
+                            <ComboboxContent>
+                              <ComboboxEmpty>کالایی یافت نشد.</ComboboxEmpty>
+                              <ComboboxList>
+                                {(product: Product) => (
+                                  <ComboboxItem
+                                    key={product.id}
+                                    value={product}
+                                  >
+                                    {product.name}
+                                  </ComboboxItem>
+                                )}
+                              </ComboboxList>
+                            </ComboboxContent>
+                            {selectedProduct ? (
+                              <p
+                                className="flex items-center gap-1.5 text-muted-foreground text-xs lg:hidden"
+                                role="note"
+                              >
+                                <span className="rounded-full bg-muted px-2 py-0.5">
+                                  {PRODUCT_UNITS[selectedProduct.unit].label}
+                                </span>
+                                <span className="tabular-nums">
+                                  قیمت پایه: {money(selectedProduct.basePrice)}{' '}
+                                  {currencyLabel}
+                                </span>
+                              </p>
+                            ) : null}
+                          </Combobox>
+                        )
+                      }}
+                    />
+                    <FieldError>
+                      {errors.items?.[index]?.name?.message}
+                    </FieldError>
+                  </FieldContent>
+                </Field>
+
+                <Field className="min-w-0">
+                  <FieldLabel className="lg:hidden">نام کالا</FieldLabel>
+                  <FieldContent>
+                    <Controller
+                      control={control}
+                      name={`items.${index}.name`}
+                      render={({ field: nameField }) => (
+                        <Input
+                          id={itemCellId(index, 'name')}
+                          placeholder="نام کالا یا خدمات"
+                          aria-invalid={!!errors.items?.[index]?.name}
+                          value={nameField.value ?? ''}
+                          onChange={(event) =>
+                            handleNameChange(index, event, nameField.onChange)
+                          }
+                          onBlur={nameField.onBlur}
+                          onKeyDown={(event) =>
+                            handleSheetEnter(event, index, 'name')
+                          }
+                        />
+                      )}
+                    />
+                    <FieldError>
+                      {errors.items?.[index]?.name?.message}
+                    </FieldError>
+                  </FieldContent>
+                </Field>
+
+                <div className="grid grid-cols-2 gap-3 lg:contents">
+                  <Field className="min-w-0">
+                    <FieldLabel className="lg:hidden">تعداد</FieldLabel>
+                    <FieldContent>
+                      <NumericCell
+                        id={itemCellId(index, 'qty')}
+                        value={items?.[index]?.quantity ?? 0}
+                        placeholder="1"
+                        onValueChange={(value) =>
+                          setValue(`items.${index}.quantity`, value)
+                        }
+                        onEnter={() => handleSheetAdvance(index, 'qty')}
+                      />
+                      <FieldError>
+                        {errors.items?.[index]?.quantity?.message}
+                      </FieldError>
+                    </FieldContent>
+                  </Field>
+
+                  <Field className="min-w-0">
+                    <FieldLabel className="lg:hidden">قیمت واحد</FieldLabel>
+                    <FieldContent>
+                      <NumericCell
+                        id={itemCellId(index, 'price')}
+                        value={items?.[index]?.unitPrice ?? 0}
+                        onValueChange={(value) =>
+                          setValue(`items.${index}.unitPrice`, value)
+                        }
+                        onEnter={() => handleSheetAdvance(index, 'price')}
+                      />
+                      <FieldError>
+                        {errors.items?.[index]?.unitPrice?.message}
+                      </FieldError>
+                    </FieldContent>
+                  </Field>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 lg:contents">
+                  <Field className="min-w-0">
+                    <FieldLabel className="lg:hidden">تخفیف</FieldLabel>
+                    <FieldContent>
+                      <NumericCell
+                        id={itemCellId(index, 'discount')}
+                        value={items?.[index]?.discount ?? 0}
+                        onValueChange={(value) =>
+                          setValue(`items.${index}.discount`, value)
+                        }
+                        onEnter={() => handleSheetAdvance(index, 'discount')}
+                      />
+                      <FieldError>
+                        {errors.items?.[index]?.discount?.message}
+                      </FieldError>
+                    </FieldContent>
+                  </Field>
+
+                  <div className="flex w-full items-center justify-between rounded-lg bg-muted/50 px-3 py-1.5 lg:flex-col lg:justify-center lg:gap-0.5 lg:bg-transparent lg:px-0 lg:py-0">
+                    <span className="text-muted-foreground text-xs lg:hidden">
+                      جمع ردیف
+                    </span>
+                    <span className="font-medium text-sm tabular-nums lg:text-end">
+                      {lineTotal(index) > 0 ? money(lineTotal(index)) : '—'}
+                    </span>
+                  </div>
+                </div>
+
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon-sm"
-                  className="text-muted-foreground"
+                  className="hidden text-muted-foreground lg:inline-flex lg:self-center"
                   disabled={singleRow}
                   onClick={() => handleRemove(index)}
                   aria-label={`حذف ردیف ${index + 1}`}
@@ -535,212 +698,44 @@ export function InvoiceForm({
                   <Trash2 />
                 </Button>
               </div>
-
-              <Field className="min-w-0">
-                <FieldLabel className="lg:hidden">کالا یا خدمت</FieldLabel>
-                <FieldContent>
-                  <Controller
-                    control={control}
-                    name={`items.${index}.productId`}
-                    render={({ field: productField }) => (
-                      <Combobox
-                        items={products}
-                        itemToStringLabel={(product) => product.name}
-                        itemToStringValue={(product) => product.id}
-                        value={
-                          products.find(
-                            (product) => product.id === productField.value
-                          ) ?? null
-                        }
-                        onValueChange={(product) =>
-                          handleProductChange(
-                            index,
-                            product ? product.id : null
-                          )
-                        }
-                      >
-                        <ComboboxInput
-                          id={itemCellId(index, 'product')}
-                          placeholder="انتخاب کالا یا خدمت..."
-                          aria-invalid={!!errors.items?.[index]?.name}
-                          showClear={false}
-                          onBlur={productField.onBlur}
-                        />
-                        <ComboboxContent>
-                          <ComboboxEmpty>کالایی یافت نشد.</ComboboxEmpty>
-                          <ComboboxList>
-                            {(product: Product) => (
-                              <ComboboxItem key={product.id} value={product}>
-                                {product.name}
-                              </ComboboxItem>
-                            )}
-                          </ComboboxList>
-                        </ComboboxContent>
-                      </Combobox>
-                    )}
-                  />
-                  <FieldError>
-                    {errors.items?.[index]?.name?.message}
-                  </FieldError>
-                </FieldContent>
-              </Field>
-
-              <Field className="min-w-0">
-                <FieldLabel className="lg:hidden">نام</FieldLabel>
-                <FieldContent>
-                  <Controller
-                    control={control}
-                    name={`items.${index}.name`}
-                    render={({ field: nameField }) => (
-                      <Input
-                        id={itemCellId(index, 'name')}
-                        placeholder="نام کالا یا خدمات"
-                        aria-invalid={!!errors.items?.[index]?.name}
-                        value={nameField.value ?? ''}
-                        onChange={(event) =>
-                          handleNameChange(index, event, nameField.onChange)
-                        }
-                        onBlur={nameField.onBlur}
-                        onKeyDown={(event) =>
-                          handleSheetEnter(event, index, 'name')
-                        }
-                      />
-                    )}
-                  />
-                  <FieldError>
-                    {errors.items?.[index]?.name?.message}
-                  </FieldError>
-                </FieldContent>
-              </Field>
-
-              <Field className="min-w-0">
-                <FieldLabel className="lg:hidden">واحد</FieldLabel>
-                <FieldContent>
-                  <Input
-                    {...register(`items.${index}.unit`)}
-                    id={itemCellId(index, 'unit')}
-                    placeholder="عدد"
-                    aria-invalid={!!errors.items?.[index]?.unit}
-                    onKeyDown={(event) =>
-                      handleSheetEnter(event, index, 'unit')
-                    }
-                  />
-                  <FieldError>
-                    {errors.items?.[index]?.unit?.message}
-                  </FieldError>
-                </FieldContent>
-              </Field>
-
-              <Field className="min-w-0">
-                <FieldLabel className="lg:hidden">تعداد</FieldLabel>
-                <FieldContent>
-                  <NumericCell
-                    id={itemCellId(index, 'qty')}
-                    value={items?.[index]?.quantity ?? 0}
-                    placeholder="1"
-                    onValueChange={(value) =>
-                      setValue(`items.${index}.quantity`, value)
-                    }
-                    onEnter={() => handleSheetAdvance(index, 'qty')}
-                  />
-                  <FieldError>
-                    {errors.items?.[index]?.quantity?.message}
-                  </FieldError>
-                </FieldContent>
-              </Field>
-
-              <Field className="min-w-0">
-                <FieldLabel className="lg:hidden">قیمت واحد</FieldLabel>
-                <FieldContent>
-                  <NumericCell
-                    id={itemCellId(index, 'price')}
-                    value={items?.[index]?.unitPrice ?? 0}
-                    onValueChange={(value) =>
-                      setValue(`items.${index}.unitPrice`, value)
-                    }
-                    onEnter={() => handleSheetAdvance(index, 'price')}
-                  />
-                  <FieldError>
-                    {errors.items?.[index]?.unitPrice?.message}
-                  </FieldError>
-                </FieldContent>
-              </Field>
-
-              <Field className="min-w-0">
-                <FieldLabel className="lg:hidden">تخفیف</FieldLabel>
-                <FieldContent>
-                  <NumericCell
-                    id={itemCellId(index, 'discount')}
-                    value={items?.[index]?.discount ?? 0}
-                    onValueChange={(value) =>
-                      setValue(`items.${index}.discount`, value)
-                    }
-                    onEnter={() => handleSheetAdvance(index, 'discount')}
-                  />
-                  <FieldError>
-                    {errors.items?.[index]?.discount?.message}
-                  </FieldError>
-                </FieldContent>
-              </Field>
-
-              <div className="flex w-full items-center justify-between rounded-lg bg-muted/50 px-3 py-1.5 lg:flex-col lg:justify-center lg:gap-0.5 lg:bg-transparent lg:px-0 lg:py-0">
-                <span className="text-muted-foreground text-xs lg:hidden">
-                  جمع ردیف
-                </span>
-                <span className="font-medium text-sm tabular-nums lg:text-end">
-                  {lineTotal(index) > 0 ? money(lineTotal(index)) : '—'}
-                </span>
-              </div>
-
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-sm"
-                className="hidden text-muted-foreground lg:inline-flex lg:self-center"
-                disabled={singleRow}
-                onClick={() => handleRemove(index)}
-                aria-label={`حذف ردیف ${index + 1}`}
-              >
-                <Trash2 />
-              </Button>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <Field>
-        <FieldLabel>
-          یادداشت <span className="text-muted-foreground">(اختیاری)</span>
-        </FieldLabel>
-        <FieldContent>
-          <Textarea
-            placeholder="یادداشت روی فاکتور..."
-            aria-invalid={!!errors.note}
-            {...register('note')}
-          />
-          <FieldError>{errors.note?.message}</FieldError>
-        </FieldContent>
-      </Field>
-
-      <Controller
-        control={control}
-        name="signature"
-        render={({ field }) => (
-          <div className="flex items-center justify-between gap-4 rounded-lg border bg-card/60 p-4">
-            <div className="space-y-0.5">
-              <p className="font-medium text-sm">نمایش امضا روی سند</p>
-              <p className="text-muted-foreground text-xs">
-                امضای فروشنده در پیش‌نمایش و پرینت نمایش داده شود
-              </p>
-            </div>
-            <Switch
-              checked={field.value}
-              onCheckedChange={field.onChange}
-              aria-label="نمایش امضا روی سند"
-            />
+            ))}
           </div>
-        )}
-      />
+        </div>
+
+        <Field>
+          <FieldLabel>
+            یادداشت <span className="text-muted-foreground">(اختیاری)</span>
+          </FieldLabel>
+          <FieldContent>
+            <Textarea
+              placeholder="یادداشت روی فاکتور..."
+              aria-invalid={!!errors.note}
+              {...register('note')}
+            />
+            <FieldError>{errors.note?.message}</FieldError>
+          </FieldContent>
+        </Field>
+
+        <Controller
+          control={control}
+          name="signature"
+          render={({ field }) => (
+            <div className="flex items-center justify-between gap-4 rounded-lg border bg-card/60 p-4">
+              <div className="space-y-0.5">
+                <p className="font-medium text-sm">نمایش امضا روی سند</p>
+                <p className="text-muted-foreground text-xs">
+                  امضای فروشنده در پیش‌نمایش و پرینت نمایش داده شود
+                </p>
+              </div>
+              <Switch
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                aria-label="نمایش امضا روی سند"
+              />
+            </div>
+          )}
+        />
+      </fieldset>
 
       <div className="sticky bottom-3 z-10 flex flex-col gap-3 rounded-xl border bg-background/90 p-3 shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-background/75 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">

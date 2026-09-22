@@ -65,13 +65,6 @@ export const invoiceFormSchema = invoiceBaseSchema.extend({
           message: 'نام کالا یا خدمات را وارد کنید',
         })
       }
-      if (item.unit?.trim() === '') {
-        ctx.addIssue({
-          code: 'custom',
-          path: [index, 'unit'],
-          message: 'واحد را وارد کنید',
-        })
-      }
     })
   }),
 })
