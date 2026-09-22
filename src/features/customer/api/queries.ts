@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { ORPCError } from '@orpc/server'
-import { and, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '@/server/db'
 import { customer } from '@/server/db/schema'
@@ -48,6 +48,17 @@ export const listCustomers = authed
   .input(z.void())
   .output(z.array(customerOutput))
   .handler(async ({ context }) => getCustomersByUserId(context.userId))
+
+export const countCustomers = authed
+  .input(z.void())
+  .output(z.object({ count: z.number() }))
+  .handler(async ({ context }) => {
+    const [result] = await db
+      .select({ count: count() })
+      .from(customer)
+      .where(eq(customer.userId, context.userId))
+    return { count: Number(result.count) }
+  })
 
 export const getCustomer = authed
   .input(z.object({ id: z.string().min(1) }))

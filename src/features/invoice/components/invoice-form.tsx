@@ -49,7 +49,7 @@ const emptyItem: InvoiceFormValues['items'][number] = {
 }
 
 const emptyForm: InvoiceFormValues = {
-  type: 'invoice',
+  type: 'proforma',
   customerId: '',
   discount: 0,
   taxRate: 0,

@@ -5,6 +5,7 @@ import {
   CircleCheck,
   EllipsisVertical,
   ListTodo,
+  Loader2,
   Pencil,
   RotateCcw,
   Trash2,
@@ -39,10 +40,14 @@ import { TaskFormDialog } from './task-form-dialog'
 function TaskCheckbox({
   completed,
   priority,
+  pending,
+  disabled,
   onToggle,
 }: {
   completed: boolean
   priority: TaskPriority
+  pending?: boolean
+  disabled?: boolean
   onToggle: () => void
 }) {
   return (
@@ -51,13 +56,16 @@ function TaskCheckbox({
       role="checkbox"
       aria-checked={completed}
       aria-label={completed ? 'بازگردانی وظیفه' : 'تکمیل وظیفه'}
+      aria-busy={pending}
+      disabled={disabled}
       onClick={onToggle}
       className={cn(
         'mt-0.5 grid size-5 shrink-0 place-items-center rounded-full border-2 transition-all duration-200',
         'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50',
         completed
           ? PRIORITY_STYLES[priority].toggle
-          : 'border-input hover:border-foreground/40'
+          : 'border-input hover:border-foreground/40',
+        disabled && 'pointer-events-none opacity-50'
       )}
     >
       <Check
@@ -73,11 +81,13 @@ function TaskCheckbox({
 
 function TaskRow({
   task,
+  pending,
   onEdit,
   onDelete,
   onToggle,
 }: {
   task: Task
+  pending: boolean
   onEdit: (id: string, values: TaskFormValues) => void
   onDelete: (id: string) => void
   onToggle: (id: string, completed: boolean) => void
@@ -97,18 +107,28 @@ function TaskRow({
       <TaskCheckbox
         completed={completed}
         priority={task.priority}
+        pending={pending}
+        disabled={pending}
         onToggle={() => onToggle(task.id, !completed)}
       />
 
       <div className="min-w-0 flex-1">
-        <p
-          className={cn(
-            'font-semibold text-sm leading-6',
-            completed && 'text-muted-foreground line-through'
+        <div className="flex items-center gap-2">
+          <p
+            className={cn(
+              'font-semibold text-sm leading-6',
+              completed && 'text-muted-foreground line-through'
+            )}
+          >
+            {task.title}
+          </p>
+          {pending && (
+            <Loader2
+              className="size-3.5 shrink-0 animate-spin text-muted-foreground"
+              aria-label="در حال همگام‌سازی"
+            />
           )}
-        >
-          {task.title}
-        </p>
+        </div>
         {task.description && (
           <p
             className={cn(
@@ -148,6 +168,7 @@ function TaskRow({
             <Button
               variant="ghost"
               size="icon-sm"
+              disabled={pending}
               className="-ms-1 -mt-1 text-muted-foreground opacity-60 transition-opacity group-hover:opacity-100"
             />
           }
@@ -156,16 +177,23 @@ function TaskRow({
           <span className="sr-only">عملیات وظیفه</span>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={() => onToggle(task.id, !completed)}>
+          <DropdownMenuItem
+            disabled={pending}
+            onClick={() => onToggle(task.id, !completed)}
+          >
             {completed ? <RotateCcw /> : <CircleCheck />}
             {completed ? 'بازگردانی' : 'تکمیل'}
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setEditOpen(true)}>
+          <DropdownMenuItem
+            disabled={pending}
+            onClick={() => setEditOpen(true)}
+          >
             <Pencil />
             ویرایش
           </DropdownMenuItem>
           <DropdownMenuItem
             variant="destructive"
+            disabled={pending}
             onClick={() => setDeleteOpen(true)}
           >
             <Trash2 />
@@ -195,6 +223,7 @@ function TaskRow({
             </Button>
             <Button
               variant="destructive"
+              disabled={pending}
               onClick={() => {
                 onDelete(task.id)
                 setDeleteOpen(false)
@@ -211,17 +240,21 @@ function TaskRow({
 
 export function TasksList({
   tasks,
+  pendingIds,
   onCreate,
   onEdit,
   onDelete,
   onToggle,
 }: {
   tasks: Task[]
+  pendingIds?: ReadonlySet<string>
   onCreate: (values: TaskFormValues) => void
   onEdit: (id: string, values: TaskFormValues) => void
   onDelete: (id: string) => void
   onToggle: (id: string, completed: boolean) => void
 }) {
+  const isPending = (id: string) => pendingIds?.has(id) ?? false
+
   if (!tasks.length) {
     return (
       <div className="rounded-2xl border border-dashed p-14 text-center">
@@ -253,6 +286,7 @@ export function TasksList({
         <TaskRow
           key={task.id}
           task={task}
+          pending={isPending(task.id)}
           onEdit={onEdit}
           onDelete={onDelete}
           onToggle={onToggle}

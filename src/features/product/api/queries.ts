@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { ORPCError } from '@orpc/server'
-import { and, desc, eq } from 'drizzle-orm'
+import { and, count, desc, eq } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '@/server/db'
 import { product } from '@/server/db/schema'
@@ -58,6 +58,17 @@ export const listProducts = authed
       .orderBy(desc(product.createdAt))
 
     return rows.map(mapProduct)
+  })
+
+export const countProducts = authed
+  .input(z.void())
+  .output(z.object({ count: z.number() }))
+  .handler(async ({ context }) => {
+    const [result] = await db
+      .select({ count: count() })
+      .from(product)
+      .where(eq(product.userId, context.userId))
+    return { count: Number(result.count) }
   })
 
 export const getProduct = authed

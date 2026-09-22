@@ -2,7 +2,7 @@
 
 import { ORPCError } from '@orpc/client'
 import { Plus } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
@@ -31,9 +31,41 @@ function sortTasks(tasks: Task[]): Task[] {
   })
 }
 
+function replaceById(tasks: Task[], id: string, next: Task): Task[] {
+  return tasks.map((task) => (task.id === id ? next : task))
+}
+
+function restoreAt(tasks: Task[], snapshot: Task, index: number): Task[] {
+  if (tasks.some((task) => task.id === snapshot.id)) {
+    return replaceById(tasks, snapshot.id, snapshot)
+  }
+  const restored = [...tasks]
+  restored.splice(Math.min(index, restored.length), 0, snapshot)
+  return restored
+}
+
 export function TasksPageClient({ tasks: initialTasks }: { tasks: Task[] }) {
   const [tasks, setTasks] = useState(initialTasks)
   const [filter, setFilter] = useState<TaskFilter>('all')
+  const [pendingIds, setPendingIds] = useState<ReadonlySet<string>>(
+    () => new Set()
+  )
+
+  const tasksRef = useRef(tasks)
+  useEffect(() => {
+    tasksRef.current = tasks
+  }, [tasks])
+
+  const flagPending = (id: string) =>
+    setPendingIds((current) => new Set(current).add(id))
+
+  const unflagPending = (id: string) =>
+    setPendingIds((current) => {
+      if (!current.has(id)) return current
+      const next = new Set(current)
+      next.delete(id)
+      return next
+    })
 
   const counts = useMemo(
     () => ({
@@ -66,23 +98,29 @@ export function TasksPageClient({ tasks: initialTasks }: { tasks: Task[] }) {
       createdAt: now,
       updatedAt: now,
     }
+    flagPending(tempId)
     setTasks((current) => sortTasks([optimistic, ...current]))
     try {
       const { id } = await api.tasks.create(values)
       setTasks((current) =>
-        current.map((task) => (task.id === tempId ? { ...task, id } : task))
+        sortTasks(
+          current.map((task) => (task.id === tempId ? { ...task, id } : task))
+        )
       )
+      unflagPending(tempId)
       toast.success('وظیفه جدید با موفقیت ثبت شد.')
     } catch {
       setTasks((current) => current.filter((task) => task.id !== tempId))
+      unflagPending(tempId)
       toast.error('ثبت وظیفه ناموفق بود. دوباره تلاش کنید.')
     }
   }
 
   async function handleUpdate(id: string, values: TaskFormValues) {
-    const index = tasks.findIndex((task) => task.id === id)
-    const snapshot = tasks[index]
-    if (!snapshot) return
+    const latest = tasksRef.current
+    const index = latest.findIndex((task) => task.id === id)
+    const snapshot = latest[index]
+    if (!snapshot || pendingIds.has(id)) return
 
     const optimistic: Task = {
       ...snapshot,
@@ -91,25 +129,24 @@ export function TasksPageClient({ tasks: initialTasks }: { tasks: Task[] }) {
       priority: values.priority,
       updatedAt: new Date().toISOString(),
     }
-    setTasks((current) =>
-      sortTasks(current.map((task) => (task.id === id ? optimistic : task)))
-    )
+    flagPending(id)
+    setTasks((current) => sortTasks(replaceById(current, id, optimistic)))
     try {
       await api.tasks.update({ id, ...values })
       toast.success('وظیفه با موفقیت ویرایش شد.')
     } catch {
-      setTasks((current) => {
-        const without = current.filter((task) => task.id !== id)
-        without.splice(index, 0, snapshot)
-        return without
-      })
+      setTasks((current) => sortTasks(replaceById(current, id, snapshot)))
       toast.error('ویرایش وظیفه ناموفق بود. دوباره تلاش کنید.')
+    } finally {
+      unflagPending(id)
     }
   }
 
   async function handleToggle(id: string, completed: boolean) {
-    const index = tasks.findIndex((task) => task.id === id)
-    const snapshot = tasks[index]
+    if (pendingIds.has(id)) return
+    const latest = tasksRef.current
+    const index = latest.findIndex((task) => task.id === id)
+    const snapshot = latest[index]
     if (!snapshot) return
 
     const optimistic: Task = {
@@ -117,42 +154,39 @@ export function TasksPageClient({ tasks: initialTasks }: { tasks: Task[] }) {
       completedAt: completed ? new Date().toISOString() : null,
       updatedAt: new Date().toISOString(),
     }
-    setTasks((current) =>
-      sortTasks(current.map((task) => (task.id === id ? optimistic : task)))
-    )
+    flagPending(id)
+    setTasks((current) => sortTasks(replaceById(current, id, optimistic)))
     try {
       await api.tasks.setCompleted({ id, completed })
     } catch {
-      setTasks((current) => {
-        const without = current.filter((task) => task.id !== id)
-        without.splice(index, 0, snapshot)
-        return without
-      })
+      setTasks((current) => sortTasks(restoreAt(current, snapshot, index)))
       toast.error('تغییر وضعیت وظیفه ناموفق بود. دوباره تلاش کنید.')
+    } finally {
+      unflagPending(id)
     }
   }
 
   async function handleDelete(id: string) {
-    const index = tasks.findIndex((task) => task.id === id)
-    const snapshot = tasks[index]
+    if (pendingIds.has(id)) return
+    const latest = tasksRef.current
+    const index = latest.findIndex((task) => task.id === id)
+    const snapshot = latest[index]
     if (!snapshot) return
 
+    flagPending(id)
     setTasks((current) => current.filter((task) => task.id !== id))
     try {
       await api.tasks.delete({ id })
       toast.success('وظیفه با موفقیت حذف شد.')
     } catch (error) {
-      setTasks((current) => {
-        if (current.some((task) => task.id === id)) return current
-        const restored = [...current]
-        restored.splice(index, 0, snapshot)
-        return restored
-      })
+      setTasks((current) => restoreAt(current, snapshot, index))
       if (error instanceof ORPCError && error.code === 'NOT_FOUND') {
         toast.error('این وظیفه یافت نشد.')
       } else {
         toast.error('حذف وظیفه ناموفق بود. دوباره تلاش کنید.')
       }
+    } finally {
+      unflagPending(id)
     }
   }
 
@@ -214,6 +248,7 @@ export function TasksPageClient({ tasks: initialTasks }: { tasks: Task[] }) {
       ) : (
         <TasksList
           tasks={visibleTasks}
+          pendingIds={pendingIds}
           onCreate={handleCreate}
           onEdit={handleUpdate}
           onDelete={handleDelete}

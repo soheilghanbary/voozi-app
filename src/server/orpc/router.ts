@@ -3,7 +3,11 @@ import {
   deleteCustomer,
   updateCustomer,
 } from '@/features/customer/api/mutations'
-import { getCustomer, listCustomers } from '@/features/customer/api/queries'
+import {
+  countCustomers,
+  getCustomer,
+  listCustomers,
+} from '@/features/customer/api/queries'
 import {
   createInvoice,
   deleteInvoice,
@@ -22,7 +26,11 @@ import {
   deleteProduct,
   updateProduct,
 } from '@/features/product/api/mutations'
-import { getProduct, listProducts } from '@/features/product/api/queries'
+import {
+  countProducts,
+  getProduct,
+  listProducts,
+} from '@/features/product/api/queries'
 import { updateBusinessProfile } from '@/features/settings/api/mutations'
 import { getBusinessProfile } from '@/features/settings/api/queries'
 import {
@@ -39,6 +47,7 @@ export const router = {
     update: updateCustomer,
     delete: deleteCustomer,
     list: listCustomers,
+    count: countCustomers,
     get: getCustomer,
   },
   products: {
@@ -46,6 +55,7 @@ export const router = {
     update: updateProduct,
     delete: deleteProduct,
     list: listProducts,
+    count: countProducts,
     get: getProduct,
   },
   notes: {

@@ -2,6 +2,7 @@
 
 import {
   EllipsisVertical,
+  Loader2,
   Pencil,
   Plus,
   StickyNote,
@@ -32,6 +33,7 @@ import { NoteFormDialog } from './note-form-dialog'
 
 type NotesGridProps = {
   notes: Note[]
+  pendingIds?: ReadonlySet<string>
   onCreate: (values: NoteFormValues) => void
   onEdit: (id: string, values: NoteFormValues) => void
   onDelete: (id: string) => void
@@ -39,10 +41,12 @@ type NotesGridProps = {
 
 function NoteCard({
   note,
+  pending,
   onEdit,
   onDelete,
 }: {
   note: Note
+  pending: boolean
   onEdit: (id: string, values: NoteFormValues) => void
   onDelete: (id: string) => void
 }) {
@@ -59,7 +63,8 @@ function NoteCard({
         'hover:-translate-y-0.5 hover:shadow-lg hover:ring-border',
         accent.wash,
         accent.edge,
-        accent.hover
+        accent.hover,
+        pending && 'pointer-events-none opacity-70'
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -72,20 +77,32 @@ function NoteCard({
               <Button
                 variant="ghost"
                 size="icon-sm"
+                disabled={pending}
                 className="-ms-1 -mt-1 text-muted-foreground opacity-60 transition-opacity group-hover:opacity-100"
               />
             }
           >
-            <EllipsisVertical />
+            {pending ? (
+              <Loader2
+                className="size-4 animate-spin"
+                aria-label="در حال همگام‌سازی"
+              />
+            ) : (
+              <EllipsisVertical />
+            )}
             <span className="sr-only">عملیات یادداشت</span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => setEditOpen(true)}>
+            <DropdownMenuItem
+              disabled={pending}
+              onClick={() => setEditOpen(true)}
+            >
               <Pencil />
               ویرایش
             </DropdownMenuItem>
             <DropdownMenuItem
               variant="destructive"
+              disabled={pending}
               onClick={() => setDeleteOpen(true)}
             >
               <Trash2 />
@@ -177,10 +194,13 @@ function EmptyState({
 
 export function NotesGrid({
   notes,
+  pendingIds,
   onCreate,
   onEdit,
   onDelete,
 }: NotesGridProps) {
+  const isPending = (id: string) => pendingIds?.has(id) ?? false
+
   if (!notes.length) {
     return <EmptyState onCreate={onCreate} />
   }
@@ -191,6 +211,7 @@ export function NotesGrid({
         <NoteCard
           key={note.id}
           note={note}
+          pending={isPending(note.id)}
           onEdit={onEdit}
           onDelete={onDelete}
         />

@@ -14,9 +14,8 @@ import { Suspense } from 'react'
 import { PageHeader } from '@/components/page-header'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { listCustomers } from '@/features/customer/api/queries'
+import { countCustomers } from '@/features/customer/api/queries'
 import { QuickAddCustomerCard } from '@/features/customer/components/quick-add-customer-card'
-import type { Customer } from '@/features/customer/types'
 import { listInvoices } from '@/features/invoice/api/queries'
 import type { Invoice } from '@/features/invoice/types'
 import { dateFormatter, numberFormatter } from '@/features/invoice/utils/format'
@@ -24,9 +23,8 @@ import { listNotes } from '@/features/note/api/queries'
 import type { Note } from '@/features/note/types'
 import { dateFormatter as noteDateFormatter } from '@/features/note/utils/format'
 import { NOTE_COLOR_STYLES } from '@/features/note/utils/note-colors'
-import { listProducts } from '@/features/product/api/queries'
+import { countProducts } from '@/features/product/api/queries'
 import { QuickAddProductCard } from '@/features/product/components/quick-add-product-card'
-import type { Product } from '@/features/product/types'
 import { getBusinessProfile } from '@/features/settings/api/queries'
 import { type BusinessProfile, CURRENCY } from '@/features/settings/types'
 import { listTasks } from '@/features/task/api/queries'
@@ -46,8 +44,8 @@ export const metadata = {
 const money = (value: number) => numberFormatter.format(value)
 
 type InvoicesPromise = Promise<Invoice[]>
-type CustomersPromise = Promise<Customer[]>
-type ProductsPromise = Promise<Product[]>
+type CustomersPromise = Promise<{ count: number }>
+type ProductsPromise = Promise<{ count: number }>
 type TasksPromise = Promise<Task[]>
 type NotesPromise = Promise<Note[]>
 type ProfilePromise = Promise<BusinessProfile>
@@ -155,7 +153,6 @@ async function StatCardsSection({
   invoices: InvoicesPromise
   customers: CustomersPromise
   products: ProductsPromise
-  tasks: TasksPromise
   profile: ProfilePromise
 }) {
   const [invoicesData, customersData, productsData, profileData] =
@@ -187,13 +184,13 @@ async function StatCardsSection({
       />
       <StatCard
         label="مشتریان"
-        value={money(customersData.length)}
+        value={money(customersData.count)}
         icon={<Users className="size-5 text-emerald-600" />}
         accent="bg-emerald-600/10 text-emerald-600"
       />
       <StatCard
         label="محصولات"
-        value={money(productsData.length)}
+        value={money(productsData.count)}
         icon={<Package className="size-5 text-amber-600" />}
         accent="bg-amber-600/10 text-amber-600"
       />
@@ -542,8 +539,8 @@ export default async function Page() {
   await connection()
 
   const invoices = Promise.resolve(call(listInvoices))
-  const customers = Promise.resolve(call(listCustomers))
-  const products = Promise.resolve(call(listProducts))
+  const customers = Promise.resolve(call(countCustomers))
+  const products = Promise.resolve(call(countProducts))
   const tasks = Promise.resolve(call(listTasks))
   const notes = Promise.resolve(call(listNotes))
   const profile = Promise.resolve(call(getBusinessProfile))
@@ -559,7 +556,6 @@ export default async function Page() {
           invoices={invoices}
           customers={customers}
           products={products}
-          tasks={tasks}
           profile={profile}
         />
       </Suspense>

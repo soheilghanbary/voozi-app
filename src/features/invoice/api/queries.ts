@@ -1,7 +1,7 @@
 import 'server-only'
 
 import { ORPCError } from '@orpc/server'
-import { and, desc, eq, inArray } from 'drizzle-orm'
+import { and, desc, eq, inArray, sql } from 'drizzle-orm'
 import { z } from 'zod'
 import { db } from '@/server/db'
 import { customer, invoice, invoiceItem } from '@/server/db/schema'
@@ -46,20 +46,11 @@ const invoiceDetailOutput = invoiceOutput.extend({
 })
 
 type InvoiceRow = typeof invoice.$inferSelect
-type InvoiceItemRow = typeof invoiceItem.$inferSelect
 
 const lineNet = (quantity: string, unitPrice: number, discount: number) =>
   Math.max(0, Number(quantity) * unitPrice - discount)
 
-function computeTotal(
-  items: Pick<InvoiceItemRow, 'quantity' | 'unitPrice' | 'discount'>[],
-  discount: number,
-  taxRate: number
-) {
-  const subtotal = items.reduce(
-    (sum, item) => sum + lineNet(item.quantity, item.unitPrice, item.discount),
-    0
-  )
+function computeTotal(subtotal: number, discount: number, taxRate: number) {
   const afterDiscount = Math.max(0, subtotal - discount)
   const tax = Math.round((afterDiscount * taxRate) / 100)
   return afterDiscount + tax
@@ -67,24 +58,22 @@ function computeTotal(
 
 function mapInvoice(
   row: InvoiceRow,
-  items: Pick<InvoiceItemRow, 'quantity' | 'unitPrice' | 'discount'>[],
-  customerNames: Map<string, string>
+  subtotal: number,
+  customerName: string | null
 ): Invoice {
   return {
     id: row.id,
     number: row.number,
     type: row.type,
     customerId: row.customerId,
-    customerName: row.customerId
-      ? (customerNames.get(row.customerId) ?? null)
-      : null,
+    customerName,
     issueDate: row.issueDate.toISOString(),
     dueDate: row.dueDate ? row.dueDate.toISOString() : null,
     discount: row.discount,
     taxRate: row.taxRate,
     note: row.note ?? '',
     signature: row.signature,
-    total: computeTotal(items, row.discount, row.taxRate),
+    total: computeTotal(subtotal, row.discount, row.taxRate),
     createdAt: row.createdAt.toISOString(),
   }
 }
@@ -106,13 +95,17 @@ export const listInvoices = authed
       ),
     ]
 
-    const [items, customers] = await Promise.all([
+    const [itemTotals, customers] = await Promise.all([
       invoiceIds.length
         ? db
-            .select()
+            .select({
+              invoiceId: invoiceItem.invoiceId,
+              subtotal: sql<number>`sum(greatest(${invoiceItem.quantity} * ${invoiceItem.unitPrice} - ${invoiceItem.discount}, 0))`,
+            })
             .from(invoiceItem)
             .where(inArray(invoiceItem.invoiceId, invoiceIds))
-        : Promise.resolve([] as InvoiceItemRow[]),
+            .groupBy(invoiceItem.invoiceId)
+        : Promise.resolve([] as { invoiceId: string; subtotal: number }[]),
       customerIds.length
         ? db
             .select({ id: customer.id, name: customer.name })
@@ -121,17 +114,18 @@ export const listInvoices = authed
         : Promise.resolve([] as { id: string; name: string }[]),
     ])
 
-    const itemsByInvoice = new Map<string, InvoiceItemRow[]>()
-    for (const item of items) {
-      const list = itemsByInvoice.get(item.invoiceId) ?? []
-      list.push(item)
-      itemsByInvoice.set(item.invoiceId, list)
-    }
+    const subtotalByInvoice = new Map(
+      itemTotals.map((total) => [total.invoiceId, Number(total.subtotal)])
+    )
 
     const customerNames = new Map(customers.map((c) => [c.id, c.name]))
 
     return rows.map((row) =>
-      mapInvoice(row, itemsByInvoice.get(row.id) ?? [], customerNames)
+      mapInvoice(
+        row,
+        subtotalByInvoice.get(row.id) ?? 0,
+        row.customerId ? (customerNames.get(row.customerId) ?? null) : null
+      )
     )
   })
 
@@ -139,29 +133,20 @@ export const getInvoice = authed
   .input(z.object({ id: z.string().min(1) }))
   .output(invoiceDetailOutput)
   .handler(async ({ input, context }) => {
-    const [row] = await db
-      .select()
+    const [joined] = await db
+      .select({ row: invoice, customerName: customer.name })
       .from(invoice)
+      .leftJoin(customer, eq(invoice.customerId, customer.id))
       .where(and(eq(invoice.id, input.id), eq(invoice.userId, context.userId)))
       .limit(1)
 
-    if (!row) {
+    if (!joined?.row) {
       throw new ORPCError('NOT_FOUND', {
         message: 'فاکتور یافت نشد.',
       })
     }
 
-    const customerNames = new Map<string, string>()
-    if (row.customerId) {
-      const [customerRow] = await db
-        .select({ id: customer.id, name: customer.name })
-        .from(customer)
-        .where(eq(customer.id, row.customerId))
-        .limit(1)
-      if (customerRow) {
-        customerNames.set(customerRow.id, customerRow.name)
-      }
-    }
+    const row = joined.row
 
     const itemRows = await db
       .select()
@@ -178,8 +163,14 @@ export const getInvoice = authed
       discount: item.discount,
     }))
 
+    const subtotal = itemRows.reduce(
+      (sum, item) =>
+        sum + lineNet(item.quantity, item.unitPrice, item.discount),
+      0
+    )
+
     return {
-      ...mapInvoice(row, itemRows, customerNames),
+      ...mapInvoice(row, subtotal, joined.customerName ?? null),
       items,
     }
   })
