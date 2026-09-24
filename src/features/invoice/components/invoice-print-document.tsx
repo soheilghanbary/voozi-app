@@ -141,7 +141,7 @@ export function InvoicePrintDocument({
           </div>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
           <div className="rounded-xl border border-zinc-100 bg-zinc-50/80 p-3.5">
             <p className="mb-1 font-medium text-[11px] text-zinc-500 tracking-wide">
               مشتری
@@ -161,19 +161,6 @@ export function InvoicePrintDocument({
               سررسید
             </p>
             <p className="font-bold text-sm text-zinc-900">{dueDate ?? '—'}</p>
-          </div>
-          <div
-            className={cn(
-              'col-span-2 rounded-xl p-3.5 ring-1 sm:col-span-1',
-              accent.soft
-            )}
-          >
-            <p className="mb-1 font-medium text-[11px] text-zinc-500 tracking-wide">
-              مبلغ نهایی
-            </p>
-            <p className="font-black text-base text-zinc-900 tabular-nums">
-              {money(totals.grandTotal)}
-            </p>
           </div>
         </div>
 
@@ -322,7 +309,7 @@ export function InvoicePrintDocument({
             {invoice.note && (
               <div className="max-w-xs rounded-xl border border-zinc-100 bg-zinc-50 p-4">
                 <p className="mb-1 font-medium text-[11px] text-zinc-500 tracking-wide">
-                  یادداشت
+                  توضیحات
                 </p>
                 <p className="whitespace-pre-wrap text-sm text-zinc-700 leading-relaxed">
                   {invoice.note}
@@ -373,7 +360,7 @@ export function InvoicePrintDocument({
                 <img
                   src={profile.signature}
                   alt="امضا"
-                  className="mx-auto mb-1 max-h-16 w-auto object-contain"
+                  className="mx-auto mb-1 max-h-20 w-auto object-contain"
                 />
               ) : null}
               <span className="text-[11px] text-zinc-400">
