@@ -9,7 +9,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { appConfig } from '@/config'
 import { CURRENCY } from '@/features/settings/types'
 import {
   INVOICE_COLOR_STYLES,
@@ -64,7 +63,7 @@ export function InvoicePrintDocument({
     ? dateFormatter.format(new Date(invoice.dueDate))
     : null
 
-  const brandName = profile?.name?.trim() || appConfig.name
+  const brandName = profile?.name?.trim()
   const brandTitle = profile?.title?.trim()
   const currency = profile?.currency ?? 'toman'
   const accent = INVOICE_COLOR_STYLES[profile?.invoiceColor ?? 'indigo']
@@ -304,21 +303,18 @@ export function InvoicePrintDocument({
           ))}
         </div>
 
-        <div className="mt-6 flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
-          <div className="order-2 sm:order-1">
-            {invoice.note && (
-              <div className="max-w-xs rounded-xl border border-zinc-100 bg-zinc-50 p-4">
-                <p className="mb-1 font-medium text-[11px] text-zinc-500 tracking-wide">
-                  توضیحات
-                </p>
-                <p className="whitespace-pre-wrap text-sm text-zinc-700 leading-relaxed">
-                  {invoice.note}
-                </p>
-              </div>
-            )}
-          </div>
-
-          <div className="order-1 w-full max-w-xs sm:order-2">
+        <div className="mt-4 flex flex-col justify-between gap-6 sm:flex-row">
+          {invoice.note && (
+            <div className="w-full max-w-sm rounded-xl border border-zinc-100 bg-zinc-50 p-4">
+              <p className="mb-1 font-medium text-[11px] text-zinc-500 tracking-wide">
+                توضیحات
+              </p>
+              <p className="whitespace-pre-wrap text-sm text-zinc-700 leading-relaxed">
+                {invoice.note}
+              </p>
+            </div>
+          )}
+          <div className="order-1 w-full sm:order-2">
             <div className="space-y-2.5 rounded-xl border border-zinc-200 bg-white p-5">
               <div className="flex items-center justify-between text-sm text-zinc-600">
                 <span>جمع ({CURRENCY[currency].label})</span>
@@ -339,14 +335,14 @@ export function InvoicePrintDocument({
                 </div>
               )}
               <div className="flex items-center justify-between text-sm text-zinc-600">
-                <span>مبلغ نهایی ({CURRENCY[currency].label})</span>
+                <span>مبلغ نهایی</span>
                 <span
                   className={cn(
                     'font-black text-xl tabular-nums',
                     accent.accentText
                   )}
                 >
-                  {money(totals.grandTotal)}
+                  {money(totals.grandTotal)} {CURRENCY[currency].label}
                 </span>
               </div>
             </div>
