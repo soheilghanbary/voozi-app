@@ -1,5 +1,5 @@
 import { Slider as SliderPrimitive } from '@base-ui/react/slider'
-import { cn } from '@/lib/utils'
+import { cn } from 'cn'
 
 function Slider({
   className,
@@ -29,7 +29,7 @@ function Slider({
       <SliderPrimitive.Control className="relative flex w-full touch-none select-none items-center data-vertical:h-full data-vertical:min-h-40 data-vertical:w-auto data-vertical:flex-col data-disabled:opacity-50">
         <SliderPrimitive.Track
           data-slot="slider-track"
-          className="relative grow select-none overflow-hidden rounded-2xl bg-input/90 data-horizontal:h-1 data-vertical:h-full data-horizontal:w-full data-vertical:w-1"
+          className="relative grow select-none overflow-hidden rounded-full bg-muted data-horizontal:h-1.5 data-vertical:h-full data-horizontal:w-full data-vertical:w-1.5"
         >
           <SliderPrimitive.Indicator
             data-slot="slider-range"
@@ -40,7 +40,7 @@ function Slider({
           <SliderPrimitive.Thumb
             data-slot="slider-thumb"
             key={index}
-            className="block size-4 shrink-0 select-none rounded-2xl bg-white not-dark:bg-clip-padding shadow-md ring-1 ring-black/10 transition-[color,box-shadow] duration-200 hover:ring-4 hover:ring-ring/30 focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-ring/30 disabled:pointer-events-none disabled:opacity-50"
+            className="block size-4 shrink-0 select-none rounded-full border border-primary bg-white shadow-sm ring-ring/50 transition-[color,box-shadow] hover:ring-4 focus-visible:outline-hidden focus-visible:ring-4 disabled:pointer-events-none disabled:opacity-50"
           />
         ))}
       </SliderPrimitive.Control>
