@@ -3,14 +3,6 @@
 import { Controller, useFormContext } from 'react-hook-form'
 import { AmountField } from '@/components/amount-field'
 import {
-  Combobox,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxInput,
-  ComboboxItem,
-  ComboboxList,
-} from '@/components/ui/combobox'
-import {
   Field,
   FieldContent,
   FieldError,
@@ -18,6 +10,7 @@ import {
 } from '@/components/ui/field'
 import type { Customer } from '@/features/customer/types'
 import type { InvoiceFormValues } from '../../utils/invoice-schema'
+import { CustomerPicker } from './customer-picker'
 
 export function CustomerFields({
   customers,
@@ -32,49 +25,26 @@ export function CustomerFields({
   } = useFormContext<InvoiceFormValues>()
 
   return (
-    <div className="grid gap-5 md:grid-cols-12">
-      <Field className="md:col-span-6">
+    <div className="grid items-start gap-5 md:grid-cols-12">
+      <Field className="gap-2 md:col-span-6">
         <FieldLabel>مشتری</FieldLabel>
         <FieldContent>
           <Controller
             control={control}
             name="customerId"
             render={({ field }) => (
-              <Combobox
-                items={customers}
-                itemToStringLabel={(customer) => customer.name}
-                itemToStringValue={(customer) => customer.id}
-                value={
-                  customers.find((customer) => customer.id === field.value) ??
-                  null
-                }
-                onValueChange={(customer) => field.onChange(customer?.id ?? '')}
-              >
-                <ComboboxInput
-                  placeholder="جستجوی مشتری..."
-                  aria-invalid={!!errors.customerId}
-                  onBlur={field.onBlur}
-                />
-                <ComboboxContent>
-                  <ComboboxEmpty>مشتری‌ای یافت نشد.</ComboboxEmpty>
-                  <ComboboxList>
-                    {(customer: Customer) => (
-                      <ComboboxItem key={customer.id} value={customer}>
-                        <span className="truncate font-medium">
-                          {customer.name}
-                        </span>
-                      </ComboboxItem>
-                    )}
-                  </ComboboxList>
-                </ComboboxContent>
-              </Combobox>
+              <CustomerPicker
+                customers={customers}
+                value={field.value}
+                onChange={(customerId) => field.onChange(customerId)}
+                invalid={!!errors.customerId}
+              />
             )}
           />
           <FieldError>{errors.customerId?.message}</FieldError>
         </FieldContent>
       </Field>
-
-      <div className="md:col-span-3">
+      <div className="grid grid-cols-2 gap-4 md:col-span-6">
         <Controller
           control={control}
           name="discount"
@@ -87,9 +57,6 @@ export function CustomerFields({
             />
           )}
         />
-      </div>
-
-      <div className="md:col-span-3">
         <Controller
           control={control}
           name="taxRate"

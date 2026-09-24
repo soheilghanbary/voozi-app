@@ -45,8 +45,7 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --font-heading: var(--font-sans);
-  --font-sans: var(--font-sans);
+  /* --font-heading: var(--font-sans); */
 
   --animate-marquee: marquee var(--duration) infinite linear;
   --animate-marquee-vertical: marquee-vertical var(--duration) linear infinite;

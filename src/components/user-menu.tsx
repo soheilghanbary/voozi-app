@@ -11,7 +11,6 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -81,7 +80,6 @@ export function UserMenu() {
             )}
           </DropdownMenuLabel>
         </DropdownMenuGroup>
-        <DropdownMenuSeparator />
         <DropdownMenuItem
           nativeButton={false}
           render={<Link href="/dashboard/settings" />}
@@ -89,7 +87,6 @@ export function UserMenu() {
           <Settings />
           تنظیمات
         </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={handleSignOut}>
           <LogOut />
           خروج

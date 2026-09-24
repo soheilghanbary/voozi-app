@@ -19,7 +19,7 @@ async function TasksSection() {
 
 function TasksSkeleton() {
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 py-4">
       <div className="flex w-fit items-center gap-1 rounded-xl bg-muted p-1">
         {Array.from({ length: 3 }).map((_, index) => (
           <Skeleton key={index} className="h-8 w-20 rounded-lg" />
