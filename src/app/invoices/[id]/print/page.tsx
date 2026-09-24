@@ -1,7 +1,6 @@
 import { call, ORPCError } from '@orpc/server'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { appConfig } from '@/config'
 import { getInvoice } from '@/features/invoice/api/queries'
 import { InvoicePrintDocument } from '@/features/invoice/components/invoice-print-document'
 import { PrintToolbar } from '@/features/invoice/components/print-toolbar'
@@ -10,10 +9,8 @@ import { getBusinessProfile } from '@/features/settings/api/queries'
 
 export const instant = false
 
-export async function generateMetadata(): Promise<Metadata> {
-  const profile = await call(getBusinessProfile).catch(() => null)
-  const brandName = profile?.name?.trim() || appConfig.name
-  return { title: { absolute: brandName } }
+export const metadata: Metadata = {
+  title: { absolute: 'چاپ فاکتور' },
 }
 
 export default async function Page({
