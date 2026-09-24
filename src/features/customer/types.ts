@@ -14,12 +14,3 @@ export type Customer = {
   address: string
   createdAt: string
 }
-
-export const CUSTOMER_COLUMN_LABELS: Record<string, string> = {
-  name: 'نام',
-  customerType: 'حقیقی یا حقوقی',
-  mobile: 'شماره تماس',
-  phone: 'تلفن',
-  address: 'آدرس',
-  createdAt: 'تاریخ عضویت',
-}

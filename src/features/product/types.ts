@@ -30,12 +30,3 @@ export type Product = {
   isActive: boolean
   createdAt: string
 }
-
-export const PRODUCT_COLUMN_LABELS: Record<string, string> = {
-  name: 'نام',
-  productType: 'خدمات یا محصول',
-  unit: 'واحد اندازه‌گیری',
-  basePrice: 'قیمت پایه',
-  isActive: 'وضعیت',
-  createdAt: 'تاریخ ثبت',
-}
