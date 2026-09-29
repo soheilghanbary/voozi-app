@@ -84,7 +84,7 @@ export function PreviewDemo() {
           <InvoicePrintDocument
             invoice={sampleInvoice}
             profile={{
-              name: 'وزیا',
+              name: 'ووزی',
               title: 'سامانه صدور فاکتور',
               description:
                 'فاکتور الکترونیکی با برند شما؛ صدور سریع و چاپ تمیز',

@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Marquee } from '@/components/ui/marquee'
 
 export const metadata: Metadata = {
-  title: 'وزیا | صدور فاکتور آنلاین',
+  title: 'ووزی | صدور فاکتور آنلاین',
   description:
     'فاکتور فروش و پیش‌فاکتور را با لوگو، امضا و رنگ دلخواه بسازید، بین ریال و تومان جابه‌جا شوید و چاپ کنید.',
 }
@@ -67,7 +67,7 @@ const steps = [
 const testimony = {
   featured: {
     quote:
-      'با وزیا برای اولین بار فاکتورهای فروشگاهم را خودم صادر می‌کنم؛ لوگو و رنگ برند روی همه سندها یکدست می‌آید.',
+      'با ووزی برای اولین بار فاکتورهای فروشگاهم را خودم صادر می‌کنم؛ لوگو و رنگ برند روی همه سندها یکدست می‌آید.',
     name: 'مریم احمدی',
     role: 'مدیر فروشگاه آنلاین',
   },
@@ -100,10 +100,10 @@ export default function LandingPage() {
           <a
             href="#top"
             className="flex items-center gap-2.5 text-foreground"
-            aria-label="وزیا"
+            aria-label="ووزی"
           >
             <Logo className="size-8 text-primary" />
-            <span className="font-black text-lg tracking-tight">وزیا</span>
+            <span className="font-black text-lg tracking-tight">ووزی</span>
           </a>
           <nav
             aria-label="لینک‌های صفحه"
@@ -222,7 +222,7 @@ export default function LandingPage() {
                   <Logo className="size-6 text-primary" />
                 </div>
                 <div>
-                  <p className="font-bold text-sm">وزیا</p>
+                  <p className="font-bold text-sm">ووزی</p>
                   <p className="text-muted-foreground text-xs">
                     سامانه صدور فاکتور
                   </p>
@@ -355,7 +355,7 @@ export default function LandingPage() {
         <div className="mx-auto w-full max-w-6xl px-6">
           <Reveal>
             <h2 className="max-w-3xl text-balance font-black text-3xl leading-tight tracking-tight sm:text-4xl">
-              از فریلنسر تا فروشگاه، همه با وزیا فاکتور صادر می‌کنند
+              از فریلنسر تا فروشگاه، همه با ووزی فاکتور صادر می‌کنند
             </h2>
           </Reveal>
           <Reveal delay={0.08}>
@@ -417,7 +417,7 @@ export default function LandingPage() {
           <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-3">
             <div className="flex items-center gap-2">
               <Logo className="size-6 text-primary" />
-              <span className="font-black tracking-tight">وزیا</span>
+              <span className="font-black tracking-tight">ووزی</span>
             </div>
             <span className="text-muted-foreground">
               صدور فاکتور با برند شما
@@ -437,7 +437,7 @@ export default function LandingPage() {
               </a>
             ))}
           </nav>
-          <p className="text-muted-foreground">© ۱۴۰۵ وزیا</p>
+          <p className="text-muted-foreground">© ۱۴۰۵ ووزی</p>
         </div>
       </footer>
     </main>

@@ -30,7 +30,7 @@ export default async function Page() {
           <span className="grid size-8 place-items-center rounded-lg bg-primary text-primary-foreground">
             <ReceiptText className="size-4.5" />
           </span>
-          <span className="font-black text-lg tracking-tight">وزیا</span>
+          <span className="font-black text-lg tracking-tight">ووزی</span>
         </div>
         <OnboardingWizard profile={profile} />
       </div>

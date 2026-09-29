@@ -112,7 +112,7 @@ export function OnboardingWizard({ profile }: { profile: BusinessProfile }) {
               <Building2 className="size-8" />
             </div>
             <h1 className="mt-5 font-black text-2xl tracking-tight">
-              به وزیا خوش آمدید
+              به ووزی خوش آمدید
             </h1>
             <p className="mx-auto mt-3 max-w-sm text-pretty text-muted-foreground leading-7">
               در چند قدم کوتاه، کسب‌وکار خود را معرفی کنید تا فاکتورها را با برند
