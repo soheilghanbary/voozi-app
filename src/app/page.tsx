@@ -3,8 +3,8 @@ import type { Metadata } from 'next'
 import { Logo } from '@/assets/logo'
 import { PreviewDemo } from '@/components/landing/preview-demo'
 import { Reveal } from '@/components/landing/reveal'
-import { SignInButton } from '@/components/landing/sign-in-button'
 import { ModeToggle } from '@/components/mode-toggle'
+import { OAuthButton } from '@/components/oauth-button'
 import { Button } from '@/components/ui/button'
 import { Marquee } from '@/components/ui/marquee'
 
@@ -92,7 +92,7 @@ export default function LandingPage() {
     <main className="relative min-h-dvh overflow-x-clip">
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 z-[60] bg-noise opacity-[0.03]"
+        className="pointer-events-none fixed inset-0 z-60 bg-noise opacity-[0.03]"
       />
 
       <header className="sticky top-0 z-40 border-border/70 border-b bg-background/80 backdrop-blur-md">
@@ -121,7 +121,7 @@ export default function LandingPage() {
           </nav>
           <div className="flex items-center gap-3">
             <ModeToggle />
-            <SignInButton size="sm" />
+            <OAuthButton />
           </div>
         </div>
       </header>
@@ -131,7 +131,7 @@ export default function LandingPage() {
       >
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem] bg-[radial-gradient(58%_50%_at_50%_0%,oklch(0.5817_0.1965_258.31/0.09),transparent_72%)]"
+          className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-136 bg-[radial-gradient(58%_50%_at_50%_0%,oklch(0.5817_0.1965_258.31/0.09),transparent_72%)]"
         />
         <div className="grid items-center gap-14 lg:grid-cols-[1.02fr_0.98fr] lg:gap-10">
           <Reveal>
@@ -148,7 +148,7 @@ export default function LandingPage() {
                 جابه‌جا شو و همه‌چیز را از یک پیشخوان مدیریت کن.
               </p>
               <div className="mt-9 flex flex-wrap items-center gap-3">
-                <SignInButton size="lg" />
+                <OAuthButton />
                 <Button
                   variant="outline"
                   size="lg"
@@ -210,7 +210,7 @@ export default function LandingPage() {
         </Reveal>
         <div className="mt-14 grid gap-4 md:grid-cols-12">
           <Reveal className="md:col-span-7">
-            <div className="relative h-full overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-20% from-primary/[0.08] via-card to-card p-8">
+            <div className="relative h-full overflow-hidden rounded-2xl border border-border bg-linear-to-br from-20% from-primary/8 via-card to-card p-8">
               <h3 className="text-pretty font-black text-xl">
                 {features[0].title}
               </h3>
@@ -360,7 +360,7 @@ export default function LandingPage() {
           </Reveal>
           <Reveal delay={0.08}>
             <blockquote className="mt-12 max-w-3xl">
-              <p className="text-balance text-pretty font-bold text-2xl leading-relaxed sm:text-3xl">
+              <p className="text-pretty font-bold text-2xl leading-relaxed sm:text-3xl">
                 «{testimony.featured.quote}»
               </p>
               <footer className="mt-5 text-sm">
@@ -391,7 +391,7 @@ export default function LandingPage() {
 
       <section className="mx-auto w-full max-w-6xl px-6 pt-24 pb-24 lg:pb-32">
         <Reveal>
-          <div className="relative overflow-hidden rounded-3xl border border-border bg-gradient-to-br from-primary/[0.09] via-card to-card px-8 py-16 text-center sm:py-20">
+          <div className="relative overflow-hidden rounded-3xl border border-border bg-linear-to-br from-primary/9 via-card to-card px-8 py-16 text-center sm:py-20">
             <div
               aria-hidden
               className="pointer-events-none absolute -top-24 left-1/2 size-72 -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
@@ -405,7 +405,7 @@ export default function LandingPage() {
                 ذخیره کن.
               </p>
               <div className="mt-9 flex justify-center">
-                <SignInButton size="lg" />
+                <OAuthButton />
               </div>
             </div>
           </div>
